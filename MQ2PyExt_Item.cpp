@@ -92,7 +92,7 @@ PythonItem::PythonItem(PCONTENTS item)
 		}
 	}
 
-	noTrade = !((EQ_Item*)item)->CanDrop(1, 0);
+	noTrade = !((EQ_Item*)item)->CanDrop(0, 1);
 
 	EvolvingCurrentLevel	= item->EvolvingCurrentLevel;
 	EvolvingMaxLevel		= item->EvolvingMaxLevel;
