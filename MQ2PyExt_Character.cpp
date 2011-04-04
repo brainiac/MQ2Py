@@ -726,8 +726,9 @@ python::dict PythonCharacter::SpellGems()
 PythonSpell PythonCharacter::SpellGem_Int(int gem)
 {
 	AssertIsValid();
+	gem = gem - 1;
 
-	if (gem > NUM_SPELL_GEMS || gem <= 0) {
+	if (gem >= NUM_SPELL_GEMS || gem < 0) {
 		PyErr_SetString(PyExc_RuntimeError, "Invalid Gem Slot");
 		throw_error_already_set();
 	}

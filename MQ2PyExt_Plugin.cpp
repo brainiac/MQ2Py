@@ -12,6 +12,8 @@
 #include "MQ2PyExt.h"
 #include "MQ2PyExt_Spawn.h"
 
+#include <fstream>
+
 using namespace std;
 using namespace boost;
 using namespace boost::python;
@@ -79,6 +81,8 @@ void Plugin::OnRemoveSpawn(PythonSpawn& OldSpawn) {}
 void Plugin::OnAddGroundItem(PythonGroundItem NewItem) {}
 void Plugin::OnRemoveGroundItem(PythonGroundItem OldItem) {}
 #endif
+
+void Plugin::Destroy() {}
 #pragma endregion
 
 #pragma region Python Plugin Wrapper
@@ -106,11 +110,15 @@ public:
 			shutdown();
 		else
 			Plugin::Shutdown();
+
+		this->Destroy();
 	}
 
 	void Default_Shutdown()
 	{
 		Plugin::Shutdown();
+
+		this->Destroy();
 	}
 
 	// Wrapper for OnZoned()
@@ -202,6 +210,7 @@ public:
 	{
 		if (override write = this->get_override("OnWriteChatColor"))
 			return write(Line, Color, Filter);
+
 		return Plugin::OnWriteChatColor(Line, Color, Filter);
 	}
 
@@ -215,6 +224,7 @@ public:
 	{
 		if (override chat = this->get_override("OnIncomingChat"))
 			return chat(Line, Color);
+
 		return Plugin::OnIncomingChat(Line, Color);
 	}
 
@@ -247,6 +257,18 @@ public:
 	void Default_OnRemoveSpawn(PythonSpawn& spawn)
 	{
 		Plugin::OnRemoveSpawn(spawn);
+	}
+
+	// destroy is implemented on the python side to provide cleanup-like services
+	void Destroy()
+	{
+		if (override destroy = this->get_override("Destroy"))
+			destroy();
+	}
+
+	void Default_Destroy()
+	{
+		Plugin::Destroy();
 	}
 };
 #pragma endregion
@@ -281,7 +303,14 @@ bool CreatePluginInstance(object plugin, std::string scriptname)
 
 	// TODO: Wrap this with a try
 	std::string command = name + "()";
-	python::object instance = python::eval(command.c_str(), main_namespace, local_namespace);
+	python::object instance;
+	try {
+		instance = python::eval(command.c_str(), main_namespace, local_namespace);
+	} catch (...) {
+		PyErr_Print();
+
+		return false;
+	}
 
 	/* this is the new plugin pointer. We'll hold onto it so we can use it later. */
 	Plugin* plugin_ptr = extract<Plugin*>(instance);
@@ -293,6 +322,14 @@ bool CreatePluginInstance(object plugin, std::string scriptname)
 		plugin_ptr->Initialize();
 	} catch  (...) {
 		PyErr_Print();
+
+		// TODO: anything that was added will need to be removed
+		try {
+			plugin_ptr->Destroy();
+		} catch (...) {
+			PyErr_Print();
+		}
+
 		return false;
 	}
 
@@ -385,6 +422,12 @@ void Propogate_OnPulse()
 			PyErr_Print();
 		}
 		it++;
+	}
+
+	try {
+		PyRun_SimpleString("mq2.ProcessEvents()");
+	} catch (error_already_set const &) {
+		PyErr_Print();
 	}
 }
 
@@ -563,12 +606,17 @@ void PyMQ2_RunScript(std::string line)
 
 		/* automatic instantiation implementation:
 		 * get list of all current subclasses of the plugin base class*/
-		python::list first = extract<python::list>(python::eval("MQ2Internal.Plugin.__subclasses__()", main_namespace, local_namespace));
+		python::list first = extract<python::list>(python::eval("mq2.Plugin.__subclasses__()", main_namespace, local_namespace));
+
+		std::ifstream infile(filename);
+		if (!infile.good()) {
+			throw std::invalid_argument(filename);
+		}
 
 		python::exec_file(filename, main_namespace, local_namespace);
 
 		/* file has been executed. Now look for any new plugin class definitions */
-		python::list second = extract<python::list>(python::eval("MQ2Internal.Plugin.__subclasses__()", main_namespace, local_namespace));
+		python::list second = extract<python::list>(python::eval("mq2.Plugin.__subclasses__()", main_namespace, local_namespace));
 
 		/* the new subclasses are appended to the end of the list, so we'll simply perform the comparison 
 		 * by using the size. */
@@ -607,6 +655,10 @@ void PyMQ2_RunScript(std::string line)
 	{
 		PyErr_Print();
 	}
+	catch (std::invalid_argument& arg)
+	{
+		WriteChatf("\ar*\ax Couldn't load plugin: \ax%s", arg.what());
+	}
 }
 
 void Init_Module_PyMQ2_Plugin()
@@ -634,6 +686,7 @@ void Init_Module_PyMQ2_Plugin()
 		.def("OnAddSpawn", &Plugin::OnAddSpawn, &PluginWrapper::Default_OnAddSpawn)
 		.def("OnRemoveSpawn", &Plugin::OnRemoveSpawn, &PluginWrapper::Default_OnRemoveSpawn)
 
+		.def("Destroy", &Plugin::Destroy, &PluginWrapper::Default_Destroy);
 		//.def_readwrite("Info", &Plugin::Info);
 	;
 }

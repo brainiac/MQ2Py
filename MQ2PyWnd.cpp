@@ -163,12 +163,11 @@ void CMQPyWnd::SetChatFont(int size)
 		PCHAR* Fonts; 
 	};
 	FONTDATA* Fonts;    // font array structure
-	CXStr* str;         // contents of stml window
 	DWORD* SelFont;     // selected font
 
 	// get fonts structure -- this offset can be found by looking at
 	// SetChatfont which is called from the /chatfontsize function
-	Fonts = (FONTDATA*)&(((char*)pWndMgr)[0x114]);
+	Fonts = (FONTDATA*)&(((char*)pWndMgr)[EQ_CHAT_FONT_OFFSET]);
 
 	// check font array bounds and pointers
 	if (size < 0 || size >= (int) Fonts->NumFonts) {
@@ -182,9 +181,10 @@ void CMQPyWnd::SetChatFont(int size)
 	SelFont = (DWORD*)Fonts->Fonts[size];
 
 	// Save the text, change the font, then restore the text
-	this->OutputBox->GetSTMLText(str);
+	CXStr str(this->OutputBox->GetSTMLText());
 	((CXWnd*)this->OutputBox)->SetFont(SelFont);
-	this->OutputBox->SetSTMLText(*str, 1, 0);
+	((CXWnd*)this->InputBox)->SetFont(SelFont);
+	this->OutputBox->SetSTMLText(str, 1, 0);
 	this->OutputBox->ForceParseNow();
 
 	// scroll to bottom of chat window
@@ -401,8 +401,7 @@ void CMQPyWnd::Write(const char* msg, ...)
 	CXStr Text(ProcessedBuffer);
 	ConvertItemTags(Text, 0);	
 
-	CXSize Whatever;
-	this->OutputBox->AppendSTML(&Whatever, Text);
+	this->OutputBox->AppendSTML(Text);
 	((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->VScrollMax);
 }
 
@@ -427,8 +426,7 @@ void CMQPyWnd::Write_NoBreak(const char* msg, ...)
 	CXStr Text(ProcessedBuffer);
 	ConvertItemTags(Text, 0);	
 
-	CXSize Whatever;
-	this->OutputBox->AppendSTML(&Whatever, Text);
+	this->OutputBox->AppendSTML(Text);
 	((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->VScrollMax);
 	this->OutputBox->ForceParseNow();
 }

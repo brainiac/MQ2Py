@@ -216,6 +216,7 @@ python::dict PythonSpell::ValidLevel()
 	ADD_SPELL_LEVEL(Beastlord);
 	ADD_SPELL_LEVEL(Berserker);
 
+#undef ADD_SPELL_LEVEL
 	return levels;
 }
 

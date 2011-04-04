@@ -46,6 +46,8 @@ public:
 	virtual void OnRemoveGroundItem(PyGroundItem OldItem);
 #endif
 
+	virtual void Destroy();
+
 	virtual ~Plugin();
 
 	boost::python::object instance;
@@ -60,12 +62,8 @@ class PythonCommand
 	boost::python::object function;
 	unsigned char* buffer;
 
-	std::string classname;
-	bool isclass;
-
 public:
 	PythonCommand(std::string command, boost::python::object function);
-	PythonCommand(std::string command, boost::python::object function, boost::python::object self);
 	~PythonCommand();
 
 private:

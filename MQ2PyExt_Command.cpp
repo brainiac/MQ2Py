@@ -32,10 +32,6 @@ PythonCommand::PythonCommand(std::string command, python::object function)
 	DebugSpew("MQ2Py: Created new command: %s", command.c_str());
 }
 
-PythonCommand::PythonCommand(std::string command, python::object function, python::object self)
-{
-}
-
 PythonCommand::~PythonCommand()
 {
 	DebugSpew("MQ2Py: Removing command: %s", command.c_str());

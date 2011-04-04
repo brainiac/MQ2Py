@@ -14,13 +14,11 @@ import sys as __sys
 __sys.stdout = MQ2Internal.OutputHandler()
 __sys.stderr = MQ2Internal.ErrorHandler()
 
-# install exit hook
-exit = MQ2Internal.PythonQuitter()
-
 # ----------------------------------------------------------------------------
 # import main game classes
 
-from MQ2Internal import Plugin, Character, Spell, Spawn, SpawnList, Item, AddCommand, RemoveCommand, WriteChat, DoCommand, GetNextArg,GetArg, GetGameState, Parse, script
+from MQ2Internal import Character, Spell, Spawn, SpawnList, Item
+from MQ2Internal import AddCommand, RemoveCommand, WriteChat, DoCommand, GetNextArg, GetArg, GetGameState, Parse, script
 
 # ----------------------------------------------------------------------------
 # "Me" is the global instance of the Character object
@@ -28,6 +26,8 @@ from MQ2Internal import Plugin, Character, Spell, Spawn, SpawnList, Item, AddCom
 Me = Character()
 
 # ----------------------------------------------------------------------------
+# create TLO dispatcher object
+
 class __TLODispatcher(object):
 	def __getattr__(self, name):
 		try:
@@ -40,3 +40,16 @@ class __TLODispatcher(object):
 
 # Create an instance of the TLO dispatcher object
 TLO = __TLODispatcher()
+
+# ----------------------------------------------------------------------------
+# import plugin base class
+
+from mq2.plugin import Plugin
+
+# ----------------------------------------------------------------------------	
+
+def ProcessEvents():
+	pass
+
+
+# ----------------------------------------------------------------------------

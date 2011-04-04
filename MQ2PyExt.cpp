@@ -121,6 +121,11 @@ std::string PyMQ2_ParseMacroData(std::string data)
 	return buff;
 }
 
+void PyMQ2_DebugSpew(std::string text)
+{
+	DebugSpew("%s", text.c_str());
+}
+
 // Initialize the extension module
 void Init_Module_PyMQ2_DataWrapper();
 void Init_Module_PyMQ2_Plugin();
@@ -153,6 +158,7 @@ void Init_Module_PyMQ2()
 	def("GetArg", &PyMQ2_GetArg, GetArg_Overloads());
 	def("GetGameState", &GetGameState);
 	def("Parse", &PyMQ2_ParseMacroData);
+	def("DebugSpew", &PyMQ2_DebugSpew);
 
 	Init_Module_PyMQ2_DataWrapper();
 	Init_Module_PyMQ2_Spell();

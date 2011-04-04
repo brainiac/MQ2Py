@@ -37,10 +37,11 @@ PLUGIN_API void InitializePlugin()
 	boost::python::detail::init_module("MQ2Internal",  &Init_Module_PyMQ2);
 
 	// This redirects the python output to the output classes below
-	//PyRun_SimpleString("from MQ2Internal import PythonQuitter");
-	//PyRun_SimpleString("exit = MQ2Internal.PythonQuitter()");
+	PyRun_SimpleString("import MQ2Internal");
+	PyRun_SimpleString("exit = MQ2Internal.PythonQuitter()");
+	PyRun_SimpleString("quit = MQ2Internal.PythonQuitter()");
 
-	PyRun_SimpleString("from mq2 import *");
+	PyRun_SimpleString("import mq2");
 	//PyRun_SimpleString("sys.stderr = MQ2.ErrorHandler()");
 	//PyRun_SimpleString("sys.stdout = MQ2.OutputHandler()");
 

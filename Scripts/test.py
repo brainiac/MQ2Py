@@ -1,7 +1,5 @@
 from mq2 import *
 
-print type(exit)
-
 class PluginTest(Plugin):
 	pulse = 0
 	

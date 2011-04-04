@@ -1,4 +1,4 @@
-
+import mq2
 
 z = locals().copy()
 
@@ -8,15 +8,15 @@ for x in z:
 	
 q = mq2.Character()
 
-print q.SpellGem(3)
+print "SpellGem 2: %s" % q.SpellGem(2)
 
 
-print TLO.Me.Heading.DegreesCCW()
-print TLO.Spell(254).Name()
+print mq2.TLO.Me.Heading.DegreesCCW()
+print mq2.TLO.Spell(254).Name()
 
 
 def OpenSpellBook():
-	if not TLO.Window["SpellBookWnd"].Open():
-		DoCommand("/keypress spellbok")
+	if not mq2.TLO.Window["SpellBookWnd"].Open():
+		mq2.DoCommand("/keypress spellbook")
 		
 OpenSpellBook()
