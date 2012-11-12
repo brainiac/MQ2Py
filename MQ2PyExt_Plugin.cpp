@@ -606,10 +606,13 @@ void PyMQ2_RunScript(std::string line)
 
 		/* automatic instantiation implementation:
 		 * get list of all current subclasses of the plugin base class*/
+		WriteChatf("Reading mq2 subclasses", filename);
 		python::list first = extract<python::list>(python::eval("mq2.Plugin.__subclasses__()", main_namespace, local_namespace));
 
+		WriteChatf("Trying to open file: \a#99ff99'%s'", filename);
 		std::ifstream infile(filename);
 		if (!infile.good()) {
+			WriteChatf("\ar*\ax Can't open file: \a#99ff99'%s'", filename);
 			throw std::invalid_argument(filename);
 		}
 
