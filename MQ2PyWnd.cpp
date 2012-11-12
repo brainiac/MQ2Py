@@ -13,6 +13,10 @@
 using namespace boost;
 using namespace boost::python;
 
+#define MAX_CHAT_SIZE 250
+#define CHAT_SIZE_RESET 200
+
+
 CMQPyWnd::CMQPyWnd(CXStr *Template) : CCustomWnd(Template)
 {
 	// Python Window Position Defaults
@@ -126,7 +130,7 @@ int CMQPyWnd::WndNotification(CXWnd *pWnd, unsigned int Message, void *data)
 	{
 		if (Message == XWM_CLOSE)
 		{
-			Show = 1;
+			dShow = 1;
 			return 1;
 		}
 	} 
@@ -208,7 +212,9 @@ void CMQPyWnd::HandleCommand(const char* szBuffer)
 		}
 		oss << command;
 				
+		//WriteChatf("CMQPyWnd::HandleCommand about to try to run: %s", oss.str().c_str());
 		bool result = extract<bool>(InteractiveInterpreter.attr("runsource")(oss.str()));
+		//WriteChatf("CMQPyWnd::HandleCommand got result : %d", result);
 
 		if (result == true) {
 			// Append this line of text to the array
@@ -226,8 +232,9 @@ void CMQPyWnd::HandleCommand(const char* szBuffer)
 			SetCXStr(&this->WindowText, "Python");
 		}
 	}
-	catch (...) {
+	catch (std::exception e) {
 		// Error occurred, reset the command status and window title
+		WriteChatf("CMQPyWnd::HandleCommand got internal exception : %s", e.what());
 		MoreCommands = false;
 		CommandBuffer.clear();
 
@@ -387,13 +394,44 @@ void CMQPyWnd::SaveChatToINI()
 
 CHAR LineBuffer[MAX_STRING * 10] = {0};
 CHAR ProcessedBuffer[MAX_STRING * 10] = {0};
+
+void CMQPyWnd::AppendText(const CXStr& text) {
+
+	if (text.Ptr->Length > 0) {
+		//CXStr empty;
+		//this->OutputBox->SetSTMLText(empty, true, NULL);
+		this->OutputBox->AppendSTML(text);
+		if (++this->OutBoxLines >= MAX_CHAT_SIZE) {
+			DWORD diff = this->OutBoxLines - CHAT_SIZE_RESET;
+			//WriteChatf("CMQPyWnd::AppendText: %d, %d", this->OutBoxLines, diff);
+			this->OutputBox->StripFirstSTMLLines(diff);
+			this->OutBoxLines = CHAT_SIZE_RESET;
+		}
+		((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->VScrollMax);
+		//this->OutputBox->ForceParseNow();
+		//WriteChatf("content: --");
+		//CXStr content = this->OutputBox->GetSTMLText();
+		//CHAR buffer[1024];
+		//GetCXStr(content.Ptr, buffer, 1024);
+		//WriteChatf("%d: %s", strlen(buffer), buffer);
+		//WriteChatf("--");
+		//this->OutputBox->StripFirstSTMLLines(1);
+		//this->OutputBox->ForceParseNow();
+		//content = this->OutputBox->GetSTMLText();
+		//GetCXStr(content.Ptr, buffer, 1024);
+		//WriteChatf("%d: %s", strlen(buffer), buffer);
+		//WriteChatf("--");
+	}
+}
+
+
 void CMQPyWnd::Write(const char* msg, ...)
 {
 	va_list valist;
 	va_start(valist, msg);
 	vsprintf_s(LineBuffer, MAX_STRING * 10, msg, valist);
 
-	this->Show = 1;
+	this->dShow = 1;
 	
 	MQToSTML(LineBuffer, ProcessedBuffer, MAX_STRING * 10, 0xffffffff);
 	strcat_s(ProcessedBuffer, MAX_STRING, "<br>");
@@ -401,8 +439,7 @@ void CMQPyWnd::Write(const char* msg, ...)
 	CXStr Text(ProcessedBuffer);
 	ConvertItemTags(Text, 0);	
 
-	this->OutputBox->AppendSTML(Text);
-	((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->VScrollMax);
+	this->AppendText(Text);
 }
 
 void CMQPyWnd::Write_NoBreak(const char* msg, ...)
@@ -411,7 +448,7 @@ void CMQPyWnd::Write_NoBreak(const char* msg, ...)
 	va_start(valist, msg);
 	vsprintf_s(LineBuffer, MAX_STRING * 10, msg, valist);
 
-	this->Show = 1;
+	this->dShow = 1;
 	
 	MQToSTML(LineBuffer, ProcessedBuffer, MAX_STRING * 10, 0xffffffff);
 
@@ -426,8 +463,7 @@ void CMQPyWnd::Write_NoBreak(const char* msg, ...)
 	CXStr Text(ProcessedBuffer);
 	ConvertItemTags(Text, 0);	
 
-	this->OutputBox->AppendSTML(Text);
-	((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->VScrollMax);
+	this->AppendText(Text);
 	this->OutputBox->ForceParseNow();
 }
 
@@ -446,4 +482,5 @@ CMQPyWnd* CMQPyWnd::Create()
 void CMQPyWnd::Clear()
 {
 	((CChatWindow*)this)->Clear();
+	OutBoxLines = 0;
 }
