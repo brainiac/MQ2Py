@@ -400,13 +400,15 @@ void CMQPyWnd::AppendText(const CXStr& text) {
 	if (text.Ptr->Length > 0) {
 		//CXStr empty;
 		//this->OutputBox->SetSTMLText(empty, true, NULL);
-		this->OutputBox->AppendSTML(text);
-		if (++this->OutBoxLines >= MAX_CHAT_SIZE) {
+		if (this->OutBoxLines >= MAX_CHAT_SIZE) {
+			DWORD scrollPos = this->OutputBox->VScrollPos;
 			DWORD diff = this->OutBoxLines - CHAT_SIZE_RESET;
 			//WriteChatf("CMQPyWnd::AppendText: %d, %d", this->OutBoxLines, diff);
 			this->OutputBox->StripFirstSTMLLines(diff);
 			this->OutBoxLines = CHAT_SIZE_RESET;
 		}
+		this->OutputBox->AppendSTML(text);
+		++this->OutBoxLines;
 		((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->VScrollMax);
 		//this->OutputBox->ForceParseNow();
 		//WriteChatf("content: --");
