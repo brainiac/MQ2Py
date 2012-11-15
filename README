@@ -1,14 +1,26 @@
 This is a MacroQuest 2 plugin written by brainiac.
+Last edit by tinmar
+
 The purpose of this plugin is to add a python plugin framework to everquest. It is a work in progress.
 
 The project files are visual studio 2010. To build this project, open up your MacroQuest 2 solution (I have a Git Repo for that as well) in visual studio 2010, and add this project to your solution.
 
-It is currently configured to link against boost::python 1.43 -- as such, you will need to install and configure your project paths to point to a copy of the boost libraries. I am providing libraries of 1.43 compiled with visual studio 2010. If you choose to use a different set of libraries, you will need to compile them yourself.
+It is currently configured to link against boost::python 1.51 -- you will need to build them yourself. Layout should be as indicated below, or feel free to edit your project file
+Get the source from: http://www.boost.org/users/history/version_1_51_0.html
 
-I am also staticly linking against python 2.6 -- those libraries are provided as well, If you want to build your own python libraries, you'll have to do that on your own.
+I am also staticly linking against python 2.7.3 -- you will need to build them yourself. Layout should be as indicated below, or feel free to edit your project file
+Get the source from: http://www.python.org/download/releases/2.7.3/
 
 To use it properly, you'll need to copy the Scripts directory to your MacroQuest2 output directory.
 
 Beyond this, there is no official documentation. There are several classes exposed. Look at the example scripts for some ideas.
 
 
+
+Expected build directory layout from the current project configuration:
++ <somewhere> + MQ2 - MQ2Main
+              |     - ...
+              |     - MQ2Py
+			  |     - ...
+			  - boost_1_51_0
+			  - Python-2.7.3
