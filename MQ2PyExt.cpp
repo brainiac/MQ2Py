@@ -45,7 +45,7 @@ struct OutputHandler
 			//remove empty lines
 			if (msg.length() > 0 && 
 				(msg.length() > 1 || msg[0] != '\n')) {
-				PyWnd->Write(msg.c_str());
+				PyWnd->Write("%s", msg.c_str());
 			}
 		} else
 			WriteChatf("\ayPy>\ax %s", msg.c_str());
@@ -80,9 +80,9 @@ void PyPrint(const char* format, ...)
 	vsprintf(szOutput, format, valist);
 
 	if (PyWnd)
-		PyWnd->Write(szOutput);
+		PyWnd->Write("%s", szOutput);
 	else
-		WriteChatf(szOutput);
+		WriteChatf("%s", szOutput);
 }
 
 void PyMQ2_WriteChat(std::string msg)
