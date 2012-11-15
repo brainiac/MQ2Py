@@ -48,6 +48,9 @@ public:
 	static CMQPyWnd* Create();
 
 private:
+
+	void AppendText(const CXStr& text);
+
     CTextEntryWnd *InputBox;
     CStmlWnd *OutputBox;
     DWORD OutBoxLines;
