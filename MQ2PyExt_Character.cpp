@@ -36,7 +36,8 @@ SpellBuffInfo::SpellBuffInfo(_SPELLBUFF const& info) : spell(info.SpellID)
 	level = info.Level;
 	duration = info.Duration;
 	modifier = info.Modifier;
-	absorb = info.DamageAbsorbRemaining;		
+	//TODO: find out where that went
+	absorb = 0; //info.DamageAbsorbRemaining;		
 }
 
 std::string SpellBuffInfo::__repr__()
@@ -430,11 +431,12 @@ int PythonCharacter::DamageAbsorbRemaining()
 	AssertIsValid();
 
 	int absorb = 0;
-	for (int i = 0; i < 25; i++) {
-		if (PSPELL pSpell = GetSpellByID(GetCharInfo2()->Buff[i].SpellID))
-			if (pSpell->SpellType != 0)
-				absorb += GetCharInfo2()->Buff[i].DamageAbsorbRemaining;
-	}
+	//TODO: find out where that went
+//	for (int i = 0; i < 25; i++) {
+//		if (pspell pspell = getspellbyid(getcharinfo2()->buff[i].spellid))
+//			if (pspell->spelltype != 0)
+//				absorb += getcharinfo2()->buff[i].damageabsorbremaining;
+//	}
 
 	return absorb;
 }

@@ -42,8 +42,10 @@ struct OutputHandler
 	void write(std::string msg)
 	{
 		if (PyWnd) {
-			if (msg.length() > 0) {
-				PyWnd->Write_NoBreak("%s", msg.c_str());
+			//remove empty lines
+			if (msg.length() > 0 && 
+				(msg.length() > 1 || msg[0] != '\n')) {
+				PyWnd->Write("%s", msg.c_str());
 			}
 		} else
 			WriteChatf("\ayPy>\ax %s", msg.c_str());
