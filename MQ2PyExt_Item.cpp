@@ -11,7 +11,6 @@
 #include "MQ2PyExt.h"
 #include "MQ2PyExt_Item.h"
 
-using namespace std;
 using namespace boost;
 using namespace boost::python;
 
@@ -47,7 +46,7 @@ void PythonItem::RegisterPythonClass()
 		.add_property("IsContainer", &PythonItem::IsContainer)
 		.add_property("IsItem", &PythonItem::IsItem)
 
-		.add_property("DmgBonusType", &PythonItem::DmgBonusType)
+		.add_property("DmgBonusType", &PythonItem::ElementalFlag)
 
 		// Fields of PythonItem - Evolving Item
 		.def_readonly("IsEvolvingItem", &PythonItem::IsEvolvingItem)
@@ -55,7 +54,6 @@ void PythonItem::RegisterPythonClass()
 		.def_readonly("EvolvingMaxLevel", &PythonItem::EvolvingMaxLevel)
 		.def_readonly("EvolvingExperienceEnabled", &PythonItem::EvolvingExpOn)
 		.def_readonly("EvolvingExperiencePercent", &PythonItem::EvolvingExpPct)
-		.def_readonly("EvolvingLoreGroup", &PythonItem::EvolvingLoreGroup)
 
 		// Fields of PythonItem - Merchant Info
 		.def_readonly("Price", &PythonItem::Price)
@@ -83,11 +81,12 @@ PythonItem::PythonItem(PCONTENTS item)
 		throw_error_already_set();
 	}
 
-	memcpy(&this->ItemData, item->Item, sizeof(_ITEMINFO));
+	memcpy(&this->ItemData, item->Item1, sizeof(_ITEMINFO));
 
 	for (int i = 0; i < 10; i++) {
-		if (item->pContentsArray->Contents[i] != NULL) {
-			PythonItem* subitem = new PythonItem(item->pContentsArray->Contents[i]);
+		auto pItem = item->Contents.ContainedItems.pItems->Item[i];
+		if (pItem != nullptr) {
+			PythonItem* subitem = new PythonItem(pItem);
 			this->Contents.push_back(subitem);
 		}
 	}
@@ -98,14 +97,13 @@ PythonItem::PythonItem(PCONTENTS item)
 	EvolvingMaxLevel		= item->EvolvingMaxLevel;
 	EvolvingExpOn			= item->EvolvingExpOn;
 	EvolvingExpPct			= (float)item->EvolvingExpPct;
-	EvolvingLoreGroup		= item->EvolvingLoreGroup;
 	IsEvolvingItem			= item->IsEvolvingItem;
 
 	Price					= item->Price;
 	MerchantQuantity		= item->MerchantQuantity;
 	MerchantSlot			= item->MerchantSlot;
 
-	ItemSlot				= item->ItemSlot;
+	ItemSlot				= item->Contents.ItemSlot;
 
 	if (ItemData.Type != ITEMTYPE_NORMAL)
 		Charges = 1;
@@ -166,9 +164,9 @@ int PythonItem::Range()
 	return ItemData.Range;
 }
 
-float PythonItem::Weight()
+int PythonItem::Weight()
 {
-	return ItemData.Weight;
+	return (int)ItemData.Weight;
 }
 
 int PythonItem::StackSize()
@@ -234,11 +232,10 @@ bool PythonItem::IsItem()
 	return ItemData.Type == ITEMTYPE_NORMAL;
 }
 
-std::string PythonItem::DmgBonusType()
+std::string PythonItem::ElementalFlag()
 {
-	return szDmgBonusType[ItemData.DmgBonusType];
+	return szDmgBonusType[ItemData.ElementalFlag];
 }
-
 
 python::list PythonItem::ItemContents()
 {

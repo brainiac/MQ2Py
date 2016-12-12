@@ -13,8 +13,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#define Py_NO_ENABLE_SHARED
-#define Py_BUILD_CORE
+//#define Py_NO_ENABLE_SHARED
+//#define Py_BUILD_CORE
 
 #include <Python.h>
 
@@ -27,7 +27,6 @@
 #include <map>
 #include <algorithm>
 #include <sstream>
-#include <hash_map>
 #include <list>
 
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>

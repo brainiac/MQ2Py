@@ -13,7 +13,6 @@
 #include "MQ2PyExt_Spell.h"
 #include "MQ2PyExt_Character.h"
 
-using namespace std;
 using namespace boost;
 using namespace boost::python;
 
@@ -153,64 +152,6 @@ int PythonCharacter::AAPointsTotal()
 {
 	AssertIsValid();
 	return GetCharInfo2()->AAPoints + GetCharInfo2()->AAPointsSpent;
-}
-
-python::dict PythonCharacter::LeaderAbilities()
-{
-	AssertIsValid();
-
-	python::dict d = python::dict();
-	
-	d["Mark NPC"] = pChar->ActiveAbilities.MarkNPC;
-	d["NPC Health"] = pChar->ActiveAbilities.NPCHealth;
-	d["Delegate Mark NPC"] = pChar->ActiveAbilities.DelegateMarkNPC;
-	d["Delegate Main Assist"] = pChar->ActiveAbilities.DelegateMA;
-	d["Inspect Buffs"] = pChar->ActiveAbilities.InspectBuffs;
-	d["Spell Awareness"] = pChar->ActiveAbilities.SpellAwareness;
-	d["Offense Enhancement"] = pChar->ActiveAbilities.OffenseEnhancement;
-	d["Mana Enhancement"] = pChar->ActiveAbilities.ManaEnhancement;
-	d["Health Enhancement"] = pChar->ActiveAbilities.HealthEnhancement;
-	d["Health Regeneration"] = pChar->ActiveAbilities.HealthRegen;
-	d["Find Path to PC"] = pChar->ActiveAbilities.FindPathPC;
-	d["Health of Target's Target"] = pChar->ActiveAbilities.HoTT;
-
-	return d;
-}
-
-float PythonCharacter::GroupLeaderXP()
-{
-	AssertIsValid();
-	return (float)pChar->GroupLeadershipExp;
-}
-
-float PythonCharacter::PctGroupLeaderXP()
-{
-	AssertIsValid();
-	return (float)pChar->GroupLeadershipExp / 10.0f;
-}
-
-int PythonCharacter::GroupLeaderPoints()
-{
-	AssertIsValid();
-	return pChar->GroupLeadershipPoints;
-}
-
-float PythonCharacter::RaidLeaderXP()
-{
-	AssertIsValid();
-	return (float)pChar->RaidLeadershipExp;
-}
-
-float PythonCharacter::PctRaidLeaderXP()
-{
-	AssertIsValid();
-	return (float)pChar->RaidLeadershipExp / 10.0f;
-}
-
-int PythonCharacter::RaidLeaderPoints()
-{
-	AssertIsValid();
-	return pChar->RaidLeadershipPoints;
 }
 
 #pragma endregion
@@ -411,19 +352,19 @@ int PythonCharacter::AttackSpeed()
 int PythonCharacter::HPRegen()
 {
 	AssertIsValid();
-	return HealthGained;
+	return GetHPRegen();
 }
 
 int PythonCharacter::ManaRegen()
 {
 	AssertIsValid();
-	return ManaGained;
+	return GetManaRegen();
 }
 
 int PythonCharacter::EnduranceRegen()
 {
 	AssertIsValid();
-	return EnduranceGained;
+	return GetEnduranceRegen();
 }
 
 int PythonCharacter::DamageAbsorbRemaining()
@@ -692,12 +633,6 @@ bool PythonCharacter::Running()
 	return *EQADDR_RUNWALKSTATE;
 }
 
-bool PythonCharacter::AltTimerReady()
-{
-	AssertIsValid();
-	return gbAltTimerReady;
-}
-
 bool PythonCharacter::Combat()
 {
 	AssertIsValid();
@@ -745,7 +680,7 @@ int PythonCharacter::SpellGem_String(std::string name)
 	for (int gem = 0; gem < NUM_SPELL_GEMS; gem++) {
 		if (PSPELL pSpell = GetSpellByID(GetCharInfo2()->MemorizedSpells[gem]))
 		{
-			if (!stricmp(name.c_str(), pSpell->Name))
+			if (!_stricmp(name.c_str(), pSpell->Name))
 				return gem + 1;
 		}
 	}
@@ -764,7 +699,7 @@ int PythonCharacter::GemSlots()
 	int index = GetAAIndexByName("Mnemonic Retention");
 	if (PlayerHasAAAbility(index)) {
 		for (int i = 0; i < AA_CHAR_MAX_REAL; i++) {
-			if (pPCData->GetAltAbilityIndex(i) == index) {
+			if (pPCData->GetAlternateAbilityId(i) == index) {
 				int points = GetCharInfo2()->AAList[i].PointsSpent;
 				if (points > 3)
 					return 10;
@@ -802,7 +737,7 @@ bool PythonCharacter::SpellReady_String(std::string name)
 
 	for (int gem = 0; gem < GemSlots(); gem++) {
 		if (PSPELL pSpell = GetSpellByID(pChar2->MemorizedSpells[gem])) {
-			if (!stricmp(name.c_str(), pSpell->Name)) {
+			if (!_stricmp(name.c_str(), pSpell->Name)) {
 				if (!pWnd->SpellSlots[gem])
 					return false;
 				return pWnd->SpellSlots[gem]->spellstate != 1;
@@ -853,8 +788,8 @@ SpellBuffInfo PythonCharacter::Buff_String(std::string name)
 
 	for (int buff = 0; buff < 25; buff++) {
 		if (PSPELL pSpell = GetSpellByID(pChar->Buff[buff].SpellID)) {
-			if (!stricmp(name.c_str(), pSpell->Name) 
-					|| (strstr(pSpell->Name, "Rk. II") && !strnicmp(name.c_str(), pSpell->Name, name.length())))
+			if (!_stricmp(name.c_str(), pSpell->Name) 
+					|| (strstr(pSpell->Name, "Rk. II") && !_strnicmp(name.c_str(), pSpell->Name, name.length())))
 				return SpellBuffInfo(pChar->Buff[buff]);
 		}
 	}
@@ -892,8 +827,8 @@ SpellBuffInfo PythonCharacter::ShortBuff_String(std::string name)
 
 	for (int buff = 0; buff < 35; buff++) {
 		if (PSPELL pSpell = GetSpellByID(pChar->ShortBuff[buff].SpellID)) {
-			if (!stricmp(name.c_str(), pSpell->Name) 
-					|| (strstr(pSpell->Name, "Rk. II") && !strnicmp(name.c_str(), pSpell->Name, name.length())))
+			if (!_stricmp(name.c_str(), pSpell->Name) 
+					|| (strstr(pSpell->Name, "Rk. II") && !_strnicmp(name.c_str(), pSpell->Name, name.length())))
 				return SpellBuffInfo(pChar->ShortBuff[buff]);
 		}
 	}
@@ -975,7 +910,7 @@ int PythonCharacter::BuffSlots()
 	int aa = GetAAIndexByName("Mystical Attuning");
 	if (PlayerHasAAAbility(aa)) {
 		for (int index = 0; index < AA_CHAR_MAX_REAL; index++) {
-			if (pPCData->GetAltAbilityIndex(index) == aa) {
+			if (pPCData->GetAlternateAbilityId(index) == aa) {
 				count += GetCharInfo2()->AAList[index].PointsSpent / 5;
 				break;
 			}
@@ -1032,7 +967,6 @@ void Init_Module_PyMQ2_Character()
 		.add_property("Autofire", &PythonCharacter::Autofire)
 		.add_property("CurrentWeight", &PythonCharacter::CurrentWeight)
 		.add_property("Running", &PythonCharacter::Running)
-		.add_property("AltTimerReady", &PythonCharacter::AltTimerReady)
 		.add_property("Combat", &PythonCharacter::Combat)
 
 		// Buffs
@@ -1066,13 +1000,6 @@ void Init_Module_PyMQ2_Character()
 		.add_property("AAPoints", &PythonCharacter::AAPoints)
 		.add_property("AAPointsTotal", &PythonCharacter::AAPointsTotal)
 		.add_property("AAPointsSpent", &PythonCharacter::AAPointsSpent)
-		.add_property("LeaderAbilities", &PythonCharacter::LeaderAbilities)
-		.add_property("GroupLeaderXP", &PythonCharacter::GroupLeaderXP)
-		.add_property("PctGroupLeaderXP", &PythonCharacter::PctGroupLeaderXP)
-		.add_property("GroupLeaderPoints", &PythonCharacter::GroupLeaderPoints)
-		.add_property("RaidLeaderXP", &PythonCharacter::RaidLeaderXP)
-		.add_property("PctRaidLeaderXP", &PythonCharacter::PctRaidLeaderXP)
-		.add_property("RaidLeaderPoints", &PythonCharacter::RaidLeaderPoints)
 
 		// Mana
 		.add_property("CurrentMana", &PythonCharacter::CurrentMana)

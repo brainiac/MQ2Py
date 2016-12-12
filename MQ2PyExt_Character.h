@@ -13,7 +13,7 @@
 class SpellBuffInfo
 {
 	int level;
-	int modifier;
+	float modifier;
 	int absorb;
 	int duration;
 
@@ -74,7 +74,6 @@ public:
 	bool Autofire();
 	int CurrentWeight();
 	bool Running();
-	bool AltTimerReady();
 	bool Combat();
 
 	// Spell Gems
@@ -112,13 +111,6 @@ public:
 	int AAPoints();
 	int AAPointsTotal();
 	int AAPointsSpent();
-	boost::python::dict LeaderAbilities();
-	float GroupLeaderXP();
-	float PctGroupLeaderXP();
-	int GroupLeaderPoints();
-	float RaidLeaderXP();
-	float PctRaidLeaderXP();
-	int RaidLeaderPoints();
 
 	// Mana
 	int CurrentMana();

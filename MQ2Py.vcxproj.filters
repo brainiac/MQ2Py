@@ -85,5 +85,6 @@
     <None Include="..\Debug\Scripts\Lib\mq2\__init__.py">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

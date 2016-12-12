@@ -17,6 +17,42 @@ using namespace boost;
 CHAR szScriptPath[MAX_STRING];
 CMQPyWnd* PyWnd = NULL;
 
+#if PY_VERSION_HEX >= 0x03000000
+#pragma comment(lib, "python35.lib")
+#else
+#pragma comment(lib, "python27.lib")
+#endif
+
+PyObject* PyInit_MQ2()
+{
+#if PY_VERSION_HEX >= 0x03000000
+	static PyModuleDef_Base initial_m_base = {
+		PyObject_HEAD_INIT(NULL)
+		0, /* m_init */
+		0, /* m_index */
+		0 /* m_copy */
+	};
+	static PyMethodDef initial_methods[] = { { 0, 0, 0, 0 } };
+	static struct PyModuleDef moduledef = {
+		initial_m_base,
+		"MQ2Internal",
+		0, /* m_doc */
+		-1, /* m_size */
+		initial_methods,
+		0, /* m_reload */
+		0, /* m_traverse */
+		0, /* m_clear */
+		0, /* m_free */
+	};
+
+	return boost::python::detail::init_module(
+		moduledef, &Init_Module_PyMQ2);
+#else
+	return boost::python::detail::init_module(
+		"MQ2Internal", &Init_Module_PyMQ2);
+#endif
+}
+
 // Called once, when the plugin is to initialize
 PLUGIN_API void InitializePlugin()
 {
@@ -34,7 +70,7 @@ PLUGIN_API void InitializePlugin()
 	DebugSpewAlways("Python Window: Initializing");
 
 	// Initialize the python extensions
-	boost::python::detail::init_module("MQ2Internal",  &Init_Module_PyMQ2);
+	PyInit_MQ2();
 
 	// This redirects the python output to the output classes below
 	PyRun_SimpleString("import MQ2Internal");

@@ -11,7 +11,6 @@
 #include "MQ2PyExt.h"
 #include "MQ2PyExt_DataWrapper.h"
 
-using namespace std;
 using namespace boost;
 using namespace boost::python;
 

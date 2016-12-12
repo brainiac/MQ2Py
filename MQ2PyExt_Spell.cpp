@@ -11,7 +11,6 @@
 #include "MQ2PyExt.h"
 #include "MQ2PyExt_Spell.h"
 
-using namespace std;
 using namespace boost;
 using namespace boost::python;
 
@@ -169,22 +168,22 @@ python::dict PythonSpell::Level()
 
 	dict levels;
 
-	levels[Warrior]			= Spell->Level[Warrior - 1];
-	levels[Cleric]			= Spell->Level[Cleric - 1];
-	levels[Paladin]			= Spell->Level[Paladin - 1];
-	levels[Ranger]			= Spell->Level[Ranger - 1];
-	levels[Shadowknight]	= Spell->Level[Shadowknight - 1];
-	levels[Druid]			= Spell->Level[Druid - 1];
-	levels[Monk]			= Spell->Level[Monk - 1];
-	levels[Bard]			= Spell->Level[Bard - 1];
-	levels[Rogue]			= Spell->Level[Rogue - 1];
-	levels[Shaman]			= Spell->Level[Shaman - 1];
-	levels[Necromancer]		= Spell->Level[Necromancer - 1];
-	levels[Wizard]			= Spell->Level[Wizard - 1];
-	levels[Mage]			= Spell->Level[Mage - 1];
-	levels[Enchanter]		= Spell->Level[Enchanter - 1];
-	levels[Beastlord]		= Spell->Level[Beastlord - 1];
-	levels[Berserker]		= Spell->Level[Berserker - 1];
+	levels[Warrior]			= Spell->ClassLevel[Warrior - 1];
+	levels[Cleric]			= Spell->ClassLevel[Cleric - 1];
+	levels[Paladin]			= Spell->ClassLevel[Paladin - 1];
+	levels[Ranger]			= Spell->ClassLevel[Ranger - 1];
+	levels[Shadowknight]	= Spell->ClassLevel[Shadowknight - 1];
+	levels[Druid]			= Spell->ClassLevel[Druid - 1];
+	levels[Monk]			= Spell->ClassLevel[Monk - 1];
+	levels[Bard]			= Spell->ClassLevel[Bard - 1];
+	levels[Rogue]			= Spell->ClassLevel[Rogue - 1];
+	levels[Shaman]			= Spell->ClassLevel[Shaman - 1];
+	levels[Necromancer]		= Spell->ClassLevel[Necromancer - 1];
+	levels[Wizard]			= Spell->ClassLevel[Wizard - 1];
+	levels[Mage]			= Spell->ClassLevel[Mage - 1];
+	levels[Enchanter]		= Spell->ClassLevel[Enchanter - 1];
+	levels[Beastlord]		= Spell->ClassLevel[Beastlord - 1];
+	levels[Berserker]		= Spell->ClassLevel[Berserker - 1];
 
 	return levels;
 }
@@ -196,8 +195,8 @@ python::dict PythonSpell::ValidLevel()
 	dict levels;
 
 #define ADD_SPELL_LEVEL(c) \
-		if (Spell->Level[c - 1] != 255) \
-			levels[c] = Spell->Level[c - 1];
+		if (Spell->ClassLevel[c - 1] != 255) \
+			levels[c] = Spell->ClassLevel[c - 1];
 
 	ADD_SPELL_LEVEL(Warrior);
 	ADD_SPELL_LEVEL(Cleric);
@@ -318,8 +317,8 @@ std::string PythonSpell::CounterType()
 {
 	AssertIsValid();
 
-	for (int i = 0; i < 12; i++) {
-		switch (Spell->Attrib[i]) {
+	for (int i = 0; i < GetSpellNumEffects(Spell); i++) {
+		switch (GetSpellAttrib(Spell, i)) {
 			case 35: return "Disease";
 			case 36: return "Poison";
 			case 116: return "Curse";
@@ -334,13 +333,13 @@ int PythonSpell::Counters()
 {
 	AssertIsValid();
 
-	for (int i = 0; i < 12; i++) {
-		switch (Spell->Attrib[i]) {
+	for (int i = 0; i < GetSpellNumEffects(Spell); i++) {
+		switch (GetSpellAttrib(Spell, i)) {
 			case 35:
 			case 36:
 			case 116:
 			case 369:
-				return (int)Spell->Base[i];
+				return (int)GetSpellBase(Spell, i);
 		}
 	}
 
@@ -401,7 +400,7 @@ bool PythonSpell::StacksPet_Int(int duration)
 	for (int buff = 0; buff < NUM_BUFF_SLOTS; buff++) {
 		if (pPet->Buff[buff] > 0 && !(pPet->Buff[buff] == 0xffffffff || pPet->Buff[buff] == 0)) {
 			PSPELL spell = GetSpellByID(pPet->Buff[buff]);
-			int petbuffduration = ((pPet->BuffFadeETA[buff] + 5999) / 1000) / 6;
+			int petbuffduration = ((pPet->PetBuffTimer[buff] + 5999) / 1000) / 6;
 
 			if (GetSpellDuration(spell, (PSPAWNINFO)pCharSpawn) >= 0xfffffffe)
 				petbuffduration = 99999 + 1;

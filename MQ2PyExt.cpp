@@ -10,7 +10,6 @@
 #include "MQ2Py.h"
 #include "MQ2PyExt.h"
 
-using namespace std;
 using namespace boost;
 using namespace boost::python;
 
@@ -77,7 +76,7 @@ void PyPrint(const char* format, ...)
 	CHAR szOutput[MAX_STRING] = {0};
 	va_list valist;
 	va_start(valist, format);
-	vsprintf(szOutput, format, valist);
+	vsprintf_s(szOutput, format, valist);
 
 	if (PyWnd)
 		PyWnd->Write("%s", szOutput);

@@ -65,12 +65,11 @@ private:
 	int EvolvingMaxLevel;
 	bool EvolvingExpOn;
 	float EvolvingExpPct;
-	int EvolvingLoreGroup;
 	bool IsEvolvingItem;
 
 	int Price;
 	int MerchantQuantity;
-	int MerchantSlot;
+	int64_t MerchantSlot;
 
 	int ItemSlot;
 	int Charges;
@@ -97,7 +96,7 @@ public:		// Properties
 	bool Attuneable();
 	
 	int Range();
-	float Weight();
+	int Weight();
 	int StackSize();
 	int Size();
 	int SizeCapacity();
@@ -109,7 +108,7 @@ public:		// Properties
 	bool IsItem();
 
 	// std::string LDoNTheme()		-- who cares? seriously
-	std::string DmgBonusType();
+	std::string ElementalFlag();
 
 	std::string __repr__();
 };

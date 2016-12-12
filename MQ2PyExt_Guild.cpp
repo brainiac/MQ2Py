@@ -10,7 +10,6 @@
 #include "MQ2Py.h"
 #include "MQ2PyExt.h"
 
-using namespace std;
 using namespace boost;
 using namespace boost::python;
 

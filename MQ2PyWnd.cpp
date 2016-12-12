@@ -20,28 +20,27 @@ using namespace boost::python;
 CMQPyWnd::CMQPyWnd(CXStr *Template) : CCustomWnd(Template)
 {
 	// Python Window Position Defaults
-	ChatTop			= 10;
-	ChatBottom		= 210;
-	ChatLeft		= 10;
-	ChatRight		= 410;
-	Locked			= 0;
-	Fades			= 1;
-	DelayTime		= 2000;
-	Duration		= 500;
-	Alpha			= 255;
-	FadeToAlpha		= 255;
-	BGType			= 1;
-	BGTintRed		= 255;
-	BGTintGreen		= 255;
-	BGTintBlue		= 255;
-	SavedFontSize	= 9;
+	ChatTop_        = 10;
+	ChatBottom_     = 210;
+	ChatLeft_       = 10;
+	ChatRight_      = 410;
+	Locked_         = 0;
+	Fades_          = 1;
+	DelayTime_      = 2000;
+	Duration_       = 500;
+	Alpha_          = 255;
+	FadeToAlpha_    = 255;
+	BGType_         = 1;
+	BGTint_.A       = 255;
+	BGTint_.R = BGTint_.G = BGTint_.B = 0;
+	SavedFontSize_  = 9;
 
 	SetWndNotification(CMQPyWnd);
 	InputBox = (CTextEntryWnd*)GetChildItem("CWChatInput");
 	InputBox->WindowStyle |= 0x800C0;
 	BitOff(WindowStyle, CWS_CLOSE);
 
-	InputBox->UnknownCW |= 0xFFFFFFFF;
+	InputBox->CRNormal |= 0xFFFFFFFF;
 	InputBox->SetMaxChars(512);
 
 	OutputBox = (CStmlWnd*)GetChildItem("CWChatOutput");
@@ -265,51 +264,65 @@ int CMQPyWnd::LoadDefaultChatSettings(PCHAR Key, int setting)
 
 void CMQPyWnd::LoadChatFromINI()
 {
-	ChatTop			= LoadDefaultChatSettings("ChatTop", ChatTop);
-	ChatBottom		= LoadDefaultChatSettings("ChatBottom", ChatBottom);
-	ChatLeft		= LoadDefaultChatSettings("ChatLeft" ,ChatLeft);
-	ChatRight		= LoadDefaultChatSettings("ChatRight", ChatRight);
-	Locked			= LoadDefaultChatSettings("Locked", Locked);
-	Fades			= LoadDefaultChatSettings("Fades", Fades);
-	DelayTime		= LoadDefaultChatSettings("Delay", DelayTime);
-	Duration		= LoadDefaultChatSettings("Duration", Duration);
-	Alpha			= LoadDefaultChatSettings("Alpha", Alpha);
-	FadeToAlpha		= LoadDefaultChatSettings("FadeToAlpha", FadeToAlpha);
-	BGType			= LoadDefaultChatSettings("BGType", BGType);
-	BGTintRed		= LoadDefaultChatSettings("BGTint.red", BGTintRed);
-	BGTintGreen		= LoadDefaultChatSettings("BGTint.green", BGTintGreen);
-	BGTintBlue		= LoadDefaultChatSettings("BGTint.blue", BGTintBlue);
-	SavedFontSize	= LoadDefaultChatSettings("FontSize", SavedFontSize);
+	ChatTop_         = LoadDefaultChatSettings("ChatTop", ChatTop_);
+	ChatBottom_      = LoadDefaultChatSettings("ChatBottom", ChatBottom_);
+	ChatLeft_        = LoadDefaultChatSettings("ChatLeft" ,ChatLeft_);
+	ChatRight_       = LoadDefaultChatSettings("ChatRight", ChatRight_);
+	Locked_          = LoadDefaultChatSettings("Locked", Locked_);
+	Fades_           = LoadDefaultChatSettings("Fades", Fades_);
+	DelayTime_       = LoadDefaultChatSettings("Delay", DelayTime_);
+	Duration_        = LoadDefaultChatSettings("Duration", Duration_);
+	Alpha_           = LoadDefaultChatSettings("Alpha", Alpha_);
+	FadeToAlpha_     = LoadDefaultChatSettings("FadeToAlpha", FadeToAlpha_);
+	BGType_          = LoadDefaultChatSettings("BGType", BGType_);
+	BGTint_.A        = LoadDefaultChatSettings("BGTint.alpha", BGTint_.A);
+	BGTint_.R        = LoadDefaultChatSettings("BGTint.red", BGTint_.R);
+	BGTint_.G        = LoadDefaultChatSettings("BGTint.green", BGTint_.G);
+	BGTint_.B        = LoadDefaultChatSettings("BGTint.blue", BGTint_.B);
+	SavedFontSize_   = LoadDefaultChatSettings("FontSize", SavedFontSize_);
 
 	CHAR Buffer[MAX_STRING] = {0};
-	sprintf(szChatINISection, "%s.%s", EQADDR_SERVERNAME, ((PCHARINFO)pCharData)->Name);
+	sprintf_s(szChatINISection, "%s.%s", EQADDR_SERVERNAME, ((PCHARINFO)pCharData)->Name);
 
-	this->Location.top		= GetPrivateProfileInt(szChatINISection, "ChatTop",		ChatTop, INIFileName);
-	this->Location.bottom	= GetPrivateProfileInt(szChatINISection, "ChatBottom",	ChatBottom, INIFileName);
-	this->Location.left		= GetPrivateProfileInt(szChatINISection, "ChatLeft",	ChatLeft, INIFileName);
-	this->Location.right 	= GetPrivateProfileInt(szChatINISection, "ChatRight",	ChatRight, INIFileName);
-	this->Locked		 	= GetPrivateProfileInt(szChatINISection, "Locked",		Locked, INIFileName);
-	this->Fades			 	= GetPrivateProfileInt(szChatINISection, "Fades",		Fades, INIFileName);
-	this->TimeMouseOver	 	= GetPrivateProfileInt(szChatINISection, "Delay",		DelayTime, INIFileName);
-	this->FadeDuration	 	= GetPrivateProfileInt(szChatINISection, "Duration",	Duration, INIFileName);
-	this->Alpha				= GetPrivateProfileInt(szChatINISection, "Alpha",		Alpha, INIFileName);
-	this->FadeToAlpha		= GetPrivateProfileInt(szChatINISection, "FadeToAlpha",	FadeToAlpha, INIFileName);
-	this->BGType			= GetPrivateProfileInt(szChatINISection, "BGType",		BGType, INIFileName);
-	this->BGColor.R			= GetPrivateProfileInt(szChatINISection, "BGTint.red",	BGTintRed, INIFileName);
-	this->BGColor.G			= GetPrivateProfileInt(szChatINISection, "BGTint.green",BGTintGreen, INIFileName);
-	this->BGColor.B			= GetPrivateProfileInt(szChatINISection, "BGTint.blue",	BGTintBlue, INIFileName);
+	this->Location.top      = GetPrivateProfileInt(szChatINISection, "ChatTop",		ChatTop_, INIFileName);
+	this->Location.bottom   = GetPrivateProfileInt(szChatINISection, "ChatBottom",	ChatBottom_, INIFileName);
+	this->Location.left     = GetPrivateProfileInt(szChatINISection, "ChatLeft",	ChatLeft_, INIFileName);
+	this->Location.right    = GetPrivateProfileInt(szChatINISection, "ChatRight",	ChatRight_, INIFileName);
+	this->Locked            = GetPrivateProfileInt(szChatINISection, "Locked",		Locked_, INIFileName);
+	this->Fades             = GetPrivateProfileInt(szChatINISection, "Fades",		Fades_, INIFileName);
+	this->FadeDelay         = GetPrivateProfileInt(szChatINISection, "Delay",		DelayTime_, INIFileName);
+	this->FadeDuration      = GetPrivateProfileInt(szChatINISection, "Duration",	Duration_, INIFileName);
+	this->Alpha             = GetPrivateProfileInt(szChatINISection, "Alpha",		Alpha_, INIFileName);
+	this->FadeToAlpha       = GetPrivateProfileInt(szChatINISection, "FadeToAlpha",	FadeToAlpha_, INIFileName);
+	this->BGType            = GetPrivateProfileInt(szChatINISection, "BGType",		BGType_, INIFileName);
+	ARGBCOLOR col = { 0 };
+	col.ARGB = this->BGColor;
+	col.A = GetPrivateProfileInt(szChatINISection, "BGTint.alpha", BGTint_.A, INIFileName);
+	col.R = GetPrivateProfileInt(szChatINISection, "BGTint.red", BGTint_.R, INIFileName);
+	col.G = GetPrivateProfileInt(szChatINISection, "BGTint.green", BGTint_.G, INIFileName);
+	col.B = GetPrivateProfileInt(szChatINISection, "BGTint.blue",	BGTint_.B, INIFileName);
+	this->BGColor = col.ARGB;
 
 	GetPrivateProfileString(szChatINISection, "WindowTitle", "Python", Buffer, MAX_STRING, INIFileName);
 	SetCXStr(&this->WindowText, Buffer);
 
-	this->SetChatFont(GetPrivateProfileInt(szChatINISection, "FontSize", SavedFontSize, INIFileName));
+	this->SetChatFont(GetPrivateProfileInt(szChatINISection, "FontSize", SavedFontSize_, INIFileName));
+}
+
+template <unsigned int _Size>LPSTR SafeItoa(int _Value, char(&_Buffer)[_Size], int _Radix)
+{
+	errno_t err = _itoa_s(_Value, _Buffer, _Radix);
+	if (!err) {
+		return _Buffer;
+	}
+	return "";
 }
 
 void CMQPyWnd::DoSaveChatToDefault()
 {
 	CHAR szTemp[MAX_STRING] = {0};
 	CHAR szChatINISection[MAX_STRING] = {0};
-	sprintf(szChatINISection, "default");
+	sprintf_s(szChatINISection, "default");
 
 	if (_chmod(INIFileName, _S_IREAD | _S_IWRITE) == -1) {
 		if (errno != ENOENT) {
@@ -319,33 +332,38 @@ void CMQPyWnd::DoSaveChatToDefault()
 	}
 
 	if (this->Minimized) {
-		WritePrivateProfileString(szChatINISection, "ChatTop",		itoa(this->OldLocation.top,		szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatBottom",	itoa(this->OldLocation.bottom,	szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatLeft",		itoa(this->OldLocation.left,	szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatRight",	itoa(this->OldLocation.right,	szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatTop", SafeItoa(this->OldLocation.top, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatBottom", SafeItoa(this->OldLocation.bottom, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatLeft", SafeItoa(this->OldLocation.left, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatRight", SafeItoa(this->OldLocation.right, szTemp, 10), INIFileName);
 	} else {
-		WritePrivateProfileString(szChatINISection, "ChatTop",		itoa(this->Location.top,		szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatBottom",	itoa(this->Location.bottom,		szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatLeft",		itoa(this->Location.left,		szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatRight",	itoa(this->Location.right,		szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatTop", SafeItoa(this->Location.top, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatBottom", SafeItoa(this->Location.bottom, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatLeft", SafeItoa(this->Location.left, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatRight", SafeItoa(this->Location.right, szTemp, 10), INIFileName);
 	}
 
 	GetCXStr(this->WindowText, szTemp);
 	WritePrivateProfileString(szChatINISection, "WindowTitle", szTemp, INIFileName);
 
-	WritePrivateProfileString(szChatINISection, "Locked",		itoa(this->Locked, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Fades",		itoa(this->Fades, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Delay",		itoa(this->MouseOver, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Duration",		itoa(this->FadeDuration,	szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Alpha",		itoa(this->Alpha, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "FadeToAlpha",	itoa(this->FadeToAlpha, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGType",		itoa(this->BGType, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGTint.red",	itoa(this->BGColor.R, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGTint.green",	itoa(this->BGColor.G, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGTint.blue",	itoa(this->BGColor.B, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "FontSize",		itoa(this->FontSize, szTemp,10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Locked", SafeItoa(this->Locked, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Fades", SafeItoa(this->Fades, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Delay", SafeItoa(this->MouseOver, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Duration",	SafeItoa(this->FadeDuration, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Alpha", SafeItoa(this->Alpha, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "FadeToAlpha", SafeItoa(this->FadeToAlpha, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGType", SafeItoa(this->BGType, szTemp, 10), INIFileName);
 
-	this->SetChatFont(GetPrivateProfileInt(szChatINISection, "FontSize", SavedFontSize, INIFileName));
+	ARGBCOLOR col = { 0 };
+	col.ARGB = this->BGColor;
+	WritePrivateProfileString(szChatINISection, "BGTint.alpha", SafeItoa(col.A, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGTint.red", SafeItoa(col.R, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGTint.green", SafeItoa(col.G, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGTint.blue", SafeItoa(col.B, szTemp, 10), INIFileName);
+
+	WritePrivateProfileString(szChatINISection, "FontSize", SafeItoa(this->FontSize, szTemp,10), INIFileName);
+
+	this->SetChatFont(GetPrivateProfileInt(szChatINISection, "FontSize", SavedFontSize_, INIFileName));
 }
 
 
@@ -362,34 +380,39 @@ void CMQPyWnd::SaveChatToINI()
 
 	if (this->Minimized)
 	{
-		WritePrivateProfileString(szChatINISection,"ChatTop",		itoa(this->OldLocation.top, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatBottom",	itoa(this->OldLocation.bottom, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatLeft",		itoa(this->OldLocation.left, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatRight",		itoa(this->OldLocation.right, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatTop", SafeItoa(this->OldLocation.top, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatBottom", SafeItoa(this->OldLocation.bottom, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatLeft", SafeItoa(this->OldLocation.left, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatRight", SafeItoa(this->OldLocation.right, szTemp, 10), INIFileName);
 	}
 	else
 	{
-		WritePrivateProfileString(szChatINISection,"ChatTop",		itoa(this->Location.top, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatBottom",	itoa(this->Location.bottom, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatLeft",		itoa(this->Location.left, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatRight",		itoa(this->Location.right, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatTop", SafeItoa(this->Location.top, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatBottom", SafeItoa(this->Location.bottom, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatLeft", SafeItoa(this->Location.left, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatRight", SafeItoa(this->Location.right, szTemp, 10), INIFileName);
 	}
 
 	GetCXStr(this->WindowText, szTemp);
 	WritePrivateProfileString(szChatINISection, "WindowTitle", szTemp, INIFileName);
 
-	WritePrivateProfileString(szChatINISection, "Locked",			itoa(this->Locked, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Fades",			itoa(this->Fades, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Delay",			itoa(this->MouseOver, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Locked", SafeItoa(this->Locked, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Fades", SafeItoa(this->Fades, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Delay", SafeItoa(this->MouseOver, szTemp, 10), INIFileName);
 
-	WritePrivateProfileString(szChatINISection, "Duration",			itoa(this->FadeDuration, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Alpha",			itoa(this->Alpha, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "FadeToAlpha",		itoa(this->FadeToAlpha, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGType",			itoa(this->BGType, szTemp,10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGTint.red",		itoa(this->BGColor.R, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGTint.green",		itoa(this->BGColor.G, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGTint.blue",		itoa(this->BGColor.B, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "FontSize",			itoa(this->FontSize, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Duration", SafeItoa(this->FadeDuration, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Alpha", SafeItoa(this->Alpha, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "FadeToAlpha", SafeItoa(this->FadeToAlpha, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGType", SafeItoa(this->BGType, szTemp, 10), INIFileName);
+
+	ARGBCOLOR col = { 0 };
+	col.ARGB = this->BGColor;
+	WritePrivateProfileString(szChatINISection, "BGTint.alpha", SafeItoa(col.A, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGTint.red", SafeItoa(col.R, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGTint.green", SafeItoa(col.G, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGTint.blue", SafeItoa(col.B, szTemp, 10), INIFileName);
+
+	WritePrivateProfileString(szChatINISection, "FontSize", SafeItoa(this->FontSize, szTemp, 10), INIFileName);
 }
 
 CHAR LineBuffer[MAX_STRING * 10] = {0};

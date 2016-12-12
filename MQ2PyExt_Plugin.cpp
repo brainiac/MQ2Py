@@ -14,7 +14,6 @@
 
 #include <fstream>
 
-using namespace std;
 using namespace boost;
 using namespace boost::python;
 
@@ -521,7 +520,7 @@ void PyMQ2_RunScript(std::string line)
 
 	const char* szCommand = GetNextArg(line.c_str());
 
-	if (!stricmp(szName, "list")) {
+	if (!_stricmp(szName, "list")) {
 		WriteChatf("\aoPython plugins Loaded:");
 		WriteChatf("\ao==================================");
 
@@ -543,7 +542,7 @@ void PyMQ2_RunScript(std::string line)
 		return;
 	}
 
-	if (!stricmp(szCommand, "unload") || !stricmp(szCommand, "reload")) {
+	if (!_stricmp(szCommand, "unload") || !_stricmp(szCommand, "reload")) {
 		/* search through the plugin classes for the plugin that is instantiated through this
 		 * filename */
 		int count = 0;
@@ -581,7 +580,7 @@ void PyMQ2_RunScript(std::string line)
 		}
 
 		/* If we're reloading, we can just continue to the loading part... */
-		if (stricmp(szCommand, "reload")) {
+		if (_stricmp(szCommand, "reload")) {
 			WriteChatf("\ar*\ax Plugin unloaded: \a#99ff99'%s'", szName);
 			return;
 		}
@@ -645,7 +644,7 @@ void PyMQ2_RunScript(std::string line)
 				if (!CreatePluginInstance(*it, scriptname)) {
 					WriteChatf("\ar*\ax Error loading plugin \a#ff9999'%s'\ax", name.c_str());
 				} else {
-					if (!stricmp(szCommand, "reload")) {
+					if (!_stricmp(szCommand, "reload")) {
 						WriteChatf("\ar*\ax Plugin Reloaded: \a#9999ff'%s'", name.c_str());
 					} else {
 						WriteChatf("\ar*\ax Plugin Loaded: \a#9999ff'%s'", name.c_str());

@@ -11,10 +11,8 @@
 #include "MQ2PyExt.h"
 #include "MQ2PyExt_Spawn.h"
 
-#include <hash_map>
+#include <unordered_map>
 
-using namespace std;
-using namespace stdext;
 using namespace boost;
 using namespace boost::python;
 
@@ -49,19 +47,18 @@ struct PythonSpawnInfo
 };
 
 
-typedef hash_map<PSPAWNINFO, PythonSpawnInfo> SpawnMap;
+typedef std::unordered_map<PSPAWNINFO, PythonSpawnInfo> SpawnMap;
 SpawnMap TrackedSpawns;
+
+static PythonSpawnInfo s_emptySpawnInfo;
 
 PythonSpawnInfo& FindPythonSpawns(PSPAWNINFO spawnToFind)
 {
-#if 0
-	hash_map<PSPAWNINFO, PythonSpawnInfo>::iterator it = TrackedSpawns(spawnToFind);
-	if (it = TrackedSpawns.end())
-		return NULL;
+	auto it = TrackedSpawns.find(spawnToFind);
+	if (it == TrackedSpawns.end())
+		return s_emptySpawnInfo;
 
-	return &it->second;
-#endif
-	return TrackedSpawns[spawnToFind];
+	return it->second;
 }
 
 void RegisterSpawn(PythonSpawn* pySpawn)
@@ -133,8 +130,9 @@ void RemoveTrackedSpawn(PSPAWNINFO pSpawn)
 	}
 
 	// remove list entry to indicate no tracked spawn
-	hash_map<PSPAWNINFO, PythonSpawnInfo>::iterator it = TrackedSpawns.find(pSpawn);
-	TrackedSpawns.erase(it);
+	auto it = TrackedSpawns.find(pSpawn);
+	if (it != TrackedSpawns.end())
+		TrackedSpawns.erase(it);
 }
 
 void UpdateTrackedSpawns()
@@ -204,8 +202,9 @@ void UpdateTrackedSpawns()
 	LastTarget = CurrentTarget;
 
 	// Update Spawn Status
-	hash_map<PSPAWNINFO, PythonSpawnInfo>::iterator it = TrackedSpawns.begin();
-	while (it != TrackedSpawns.end()) {
+	auto it = TrackedSpawns.begin();
+	while (it != TrackedSpawns.end())
+	{
 		PSPAWNINFO curSpawn = it->first;
 		if (curSpawn != NULL) {
 			eSpawnType spawnType = GetSpawnType(curSpawn);
@@ -395,10 +394,10 @@ PlayerClass PythonSpawn::Class()
 {
 	AssertIsValid();
 
-	if (pSpawn->Class > TotalClasses || pSpawn->Class < Unknown)
+	if (pSpawn->mActorClient.Class > TotalClasses || pSpawn->mActorClient.Class < Unknown)
 		return Unknown;
 
-	return (PlayerClass)pSpawn->Class;
+	return (PlayerClass)pSpawn->mActorClient.Class;
 }
 
 //----------------------------------------------------------------------------

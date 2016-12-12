@@ -25,11 +25,11 @@ void PyMQ2_RunScript(std::string line);
 class CMQPyWnd : public CCustomWnd
 {
 public:
-    CMQPyWnd(CXStr *Template);
-    ~CMQPyWnd();
+	CMQPyWnd(CXStr *Template);
+	~CMQPyWnd();
 
-    int WndNotification(CXWnd *pWnd, unsigned int Message, void *unknown);
-    void SetChatFont(int size);
+	int WndNotification(CXWnd *pWnd, unsigned int Message, void *unknown);
+	void SetChatFont(int size);
 
 	void HandleCommand(const char* szBuffer);
 	void AddTextToCommandHistory(const char* szBuffer);
@@ -51,10 +51,10 @@ private:
 
 	void AppendText(const CXStr& text);
 
-    CTextEntryWnd *InputBox;
-    CStmlWnd *OutputBox;
-    DWORD OutBoxLines;
-    DWORD FontSize;
+	CTextEntryWnd *InputBox;
+	CStmlWnd *OutputBox;
+	DWORD OutBoxLines;
+	DWORD FontSize;
 
 	vector<string> CommandHistory;
 	enum { CMD_HIST_MAX = 40 };
@@ -63,21 +63,19 @@ private:
 	CHAR szChatINISection[MAX_STRING];
 
 	// Python Window Position Defaults
-	int ChatTop;
-	int ChatBottom;
-	int ChatLeft;
-	int ChatRight;
-	int Locked;
-	int Fades;
-	int DelayTime;
-	int Duration;
-	int Alpha;
-	int FadeToAlpha;
-	int BGType;
-	int BGTintRed;
-	int BGTintGreen;
-	int BGTintBlue;
-	int SavedFontSize;
+	int ChatTop_;
+	int ChatBottom_;
+	int ChatLeft_;
+	int ChatRight_;
+	int Locked_;
+	int Fades_;
+	int DelayTime_;
+	int Duration_;
+	int Alpha_;
+	int FadeToAlpha_;
+	int BGType_;
+	ARGBCOLOR BGTint_;
+	int SavedFontSize_;
 	
 	boost::python::object InteractiveInterpreter;
 	std::vector<std::string> CommandBuffer;
