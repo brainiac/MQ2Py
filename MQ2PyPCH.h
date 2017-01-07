@@ -13,8 +13,15 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-//#define Py_NO_ENABLE_SHARED
-//#define Py_BUILD_CORE
+// Annoyingly, the python nuget package does not supply a debug python_d.lib
+// and the release version of the headers #define some functions into macros
+// meaning they don't exist... undef Py_DEBUG so they stay defined as functions,
+// and ponder the day when an actual nuget package with debug libs is introduced
+// that actually works.
+#include <pyconfig.h>
+#ifdef _DEBUG
+#undef Py_DEBUG
+#endif
 
 #include <Python.h>
 
