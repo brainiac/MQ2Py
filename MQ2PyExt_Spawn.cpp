@@ -329,7 +329,7 @@ std::string PythonSpawn::CleanName()
 
 	char buffer[MAX_STRING];
 	strcpy_s(buffer, MAX_STRING, pSpawn->Name);
-	CleanupName(buffer, false, false);
+	CleanupName(buffer, MAX_STRING, false, false);
 
 	return buffer;
 }
