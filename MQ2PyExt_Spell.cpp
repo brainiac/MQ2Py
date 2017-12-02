@@ -68,10 +68,10 @@ std::string PythonSpell::Name()
 	return Spell->Name;
 }
 
-int PythonSpell::Mana()
+int PythonSpell::ManaCost()
 {
 	AssertIsValid();
-	return Spell->Mana;
+	return Spell->ManaCost;
 }
 
 int PythonSpell::ResistAdj()
@@ -107,7 +107,7 @@ float PythonSpell::CastTime()
 float PythonSpell::RecoveryTime()
 {
 	AssertIsValid();
-	return (float)Spell->FizzleTime / 1000.0f;
+	return (float)Spell->RecoveryTime / 1000.0f;
 }
 
 float PythonSpell::RecastTime()
@@ -469,7 +469,7 @@ void PythonSpell::AssertIsValid()
 std::string PythonSpell::__repr__()
 {
 	if (IsValid()) {
-		ostringstream ss;
+		std::ostringstream ss;
 		ss << "Spell: " << Spell->Name << " (" << Spell->ID << ")";
 		return ss.str();
 	}
@@ -489,7 +489,7 @@ void Init_Module_PyMQ2_Spell()
 		// properties
 		.add_property("ID", &PythonSpell::Id)
 		.add_property("Name", &PythonSpell::Name)
-		.add_property("Mana", &PythonSpell::Mana)
+		.add_property("ManaCost", &PythonSpell::ManaCost)
 		.add_property("ResistAdj", &PythonSpell::ResistAdj)
 		.add_property("Range", &PythonSpell::Range)
 		.add_property("AERange", &PythonSpell::AERange)

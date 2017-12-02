@@ -57,7 +57,7 @@ DataMemberWrapper::DataMemberWrapper(MQ2Type* t, std::string n, const MQ2TYPEVAR
 
 std::string DataMemberWrapper::__repr__()
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << "<MQ2Type: " << type->GetName() << ", Member: " << member << ">";
 
 	return oss.str();
@@ -85,7 +85,7 @@ python::object DataMemberWrapper::__call_str__(std::string args)
 
 python::object DataMemberWrapper::__call_int__(int arg)
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << arg;
 
 	return __call_str__(oss.str());
@@ -115,7 +115,7 @@ std::string DataTypeWrapper::Name()
 
 std::string DataTypeWrapper::__repr__()
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << "<MQ2Type: " << type->GetName() << ">";
 
 	return oss.str();
@@ -177,7 +177,7 @@ TLOWrapper::TLOWrapper(PyObject* _self, const TLOWrapper& other)
 
 std::string TLOWrapper::__repr__()
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << "<TopLevelObject: " << name << ">";
 
 	return oss.str();
@@ -198,7 +198,7 @@ python::object TLOWrapper::__call_str__(std::string args)
 
 python::object TLOWrapper::__call_int__(int value)
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << value;
 
 	return __call_str__(oss.str());

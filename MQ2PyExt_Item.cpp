@@ -250,7 +250,7 @@ python::list PythonItem::ItemContents()
 
 std::string PythonItem::__repr__()
 {
-	ostringstream ss;
+	std::ostringstream ss;
 	ss << "Item: " << ItemData.Name;
 	
 	return ss.str();

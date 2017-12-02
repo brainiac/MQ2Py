@@ -30,7 +30,7 @@ public:
 	{
 		static int AutoCount = 1;
 
-		ostringstream ss;
+		std::ostringstream ss;
 		ss << "UnnamedPlugin" << AutoCount++;
 		Name = ss.str();
 

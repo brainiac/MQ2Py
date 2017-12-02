@@ -544,7 +544,7 @@ void PythonSpawn::SetSpawn(PSPAWNINFO pSpawn)
 std::string PythonSpawn::__repr__()
 {
 	if (IsValid()) {
-		ostringstream ss;
+		std::ostringstream ss;
 		ss << "Spawn: " << pSpawn->Name << " (" << pSpawn->SpawnID << ")";
 		return ss.str();
 	}

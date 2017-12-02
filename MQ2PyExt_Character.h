@@ -104,7 +104,7 @@ public:
 	boost::python::list Abilities();		// NYI
 
 	// Experience
-	int XP();
+	int64_t XP();
 	float PctXP();
 	int AAXP();
 	float PctAAXP();
@@ -123,8 +123,8 @@ public:
 	int MaxEndurance();
 
 	// Tribute
-	int CurrentFavor();
-	int CareerFavor();
+	int64_t CurrentFavor();
+	int64_t CareerFavor();
 	bool TributeActive();
 	int TributeTimer();
 	int ActiveFavorCost();

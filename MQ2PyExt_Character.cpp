@@ -41,7 +41,7 @@ SpellBuffInfo::SpellBuffInfo(_SPELLBUFF const& info) : spell(info.SpellID)
 
 std::string SpellBuffInfo::__repr__()
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << "Buff: ";
 
 	if (!IsValid())
@@ -112,7 +112,7 @@ bool PythonCharacter::IsValid()
 // Experience
 
 #pragma region Experience
-int PythonCharacter::XP()
+int64_t PythonCharacter::XP()
 {
 	AssertIsValid();
 	return pChar->Exp;
@@ -387,13 +387,13 @@ int PythonCharacter::DamageAbsorbRemaining()
 // Tribute
 
 #pragma region Tribute
-int PythonCharacter::CurrentFavor()
+int64_t PythonCharacter::CurrentFavor()
 {
 	AssertIsValid();
 	return pChar->CurrFavor;
 }
 
-int PythonCharacter::CareerFavor()
+int64_t PythonCharacter::CareerFavor()
 {
 	AssertIsValid();
 	return pChar->CareerFavor;

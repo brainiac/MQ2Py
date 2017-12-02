@@ -25,7 +25,7 @@ public:
 	// Properties
 	int Id();
 	std::string Name();
-	int Mana();
+	int ManaCost();
 	int ResistAdj();
 	float Range();
 	float AERange();

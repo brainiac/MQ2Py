@@ -45,7 +45,7 @@ CMQPyWnd::CMQPyWnd(CXStr *Template) : CCustomWnd(Template)
 
 	OutputBox = (CStmlWnd*)GetChildItem("CWChatOutput");
 	OutBoxLines = 0;
-	*(DWORD*)&(((PCHAR)OutputBox)[EQ_CHAT_HISTORY_OFFSET]) = 400;
+	//*(DWORD*)&(((PCHAR)OutputBox)[EQ_CHAT_HISTORY_OFFSET]) = 400;
 
 	OutputBox->Clickable = 1;
 
@@ -100,7 +100,7 @@ int CMQPyWnd::WndNotification(CXWnd *pWnd, unsigned int Message, void *data)
 					if (CommandHistory.size() > 0) {
 						CurrentCommand++;
 						if (CurrentCommand < (int)CommandHistory.size() && CurrentCommand >= 0) {
-							string s = CommandHistory[CurrentCommand];
+							std::string s = CommandHistory[CurrentCommand];
 							//SetCXStr(&InputBox->InputText, (PCHAR)s.c_str());
 							((CXWnd*)this->InputBox)->SetWindowTextA(CXStr(s.c_str()));
 						} else {
@@ -113,7 +113,7 @@ int CMQPyWnd::WndNotification(CXWnd *pWnd, unsigned int Message, void *data)
 					if (CommandHistory.size() > 0) {
 						CurrentCommand--;
 						if (CurrentCommand >= 0 && CommandHistory.size() > 0) {
-							string s = CommandHistory[CurrentCommand];
+							std::string s = CommandHistory[CurrentCommand];
 							SetCXStr(&InputBox->InputText, (PCHAR)s.c_str());
 						} else if (CurrentCommand < 0) {
 							CurrentCommand = -1;
@@ -205,7 +205,7 @@ void CMQPyWnd::HandleCommand(const char* szBuffer)
 
 	try {
 		// Construct the command string
-		ostringstream oss;
+		std::ostringstream oss;
 		for (std::vector<std::string>::const_iterator it = CommandBuffer.begin(); it != CommandBuffer.end(); it++) {
 			oss << *it << "\n";				
 		}
@@ -250,7 +250,7 @@ void CMQPyWnd::AddTextToCommandHistory(const char* szBuffer)
 	if (CommandHistory.size() == 0 || CommandHistory.front().compare(szBuffer) != 0) {
 		if (CommandHistory.size() > CMD_HIST_MAX)
 			CommandHistory.pop_back();
-		CommandHistory.insert(CommandHistory.begin(), string(szBuffer));
+		CommandHistory.insert(CommandHistory.begin(), std::string(szBuffer));
 	}
 
 	CurrentCommand = -1;
@@ -478,9 +478,9 @@ void CMQPyWnd::Write_NoBreak(const char* msg, ...)
 	MQToSTML(LineBuffer, ProcessedBuffer, MAX_STRING * 10, 0xffffffff);
 
 	// Replace file path with <scripts>
-	string temp = ProcessedBuffer;
+	std::string temp = ProcessedBuffer;
 	size_t found = temp.find(szScriptPath);
-	if (found != string::npos) {
+	if (found != std::string::npos) {
 		temp.replace(found, strlen(szScriptPath), "<scripts>");
 		strcpy_s(ProcessedBuffer, MAX_STRING * 10, temp.c_str());
 	}

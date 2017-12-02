@@ -56,7 +56,7 @@ private:
 	DWORD OutBoxLines;
 	DWORD FontSize;
 
-	vector<string> CommandHistory;
+	std::vector<std::string> CommandHistory;
 	enum { CMD_HIST_MAX = 40 };
 	int CurrentCommand;
 

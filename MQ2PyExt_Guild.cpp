@@ -32,9 +32,9 @@ public:
 		return pGuild != NULL && pGuild->FindMemberByName((char*)name.c_str());
 	}
 
-	static std::string NameByID(int id)
+	static std::string NameByID(int64_t id)
 	{
-		return GetGuildByID((DWORD)id);
+		return GetGuildByID(id);
 	}
 
 	static int IDByName(std::string name)
