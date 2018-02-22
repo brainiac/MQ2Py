@@ -46,9 +46,11 @@ public:
 	std::string TargetType();
 	std::string Skill();
 
+#if defined(EMU)
 	std::string CastOnYouMessage();
 	std::string CastOnOtherMessage();
 	std::string WearOffMessage();
+#endif
 
 	std::string CounterType();
 	int Counters();

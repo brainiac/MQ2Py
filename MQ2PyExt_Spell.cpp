@@ -295,6 +295,7 @@ std::string PythonSpell::Skill()
 	return szSkills[Spell->Skill];
 }
 
+#if defined(EMU)
 std::string PythonSpell::CastOnYouMessage()
 {
 	AssertIsValid();
@@ -312,6 +313,7 @@ std::string PythonSpell::WearOffMessage()
 	AssertIsValid();
 	return Spell->WearOff;
 }
+#endif
 
 std::string PythonSpell::CounterType()
 {
@@ -508,9 +510,11 @@ void Init_Module_PyMQ2_Spell()
 		.add_property("TargetType", &PythonSpell::TargetType)
 		.add_property("Skill", &PythonSpell::Skill)
 
+#if defined(EMU)
 		.add_property("CastOnYouMessage", &PythonSpell::CastOnYouMessage)
 		.add_property("CastOnOtherMessage", &PythonSpell::CastOnOtherMessage)
 		.add_property("WearOffMessage", &PythonSpell::WearOffMessage)
+#endif
 
 		.add_property("CounterType", &PythonSpell::CounterType)
 		.add_property("Counters", &PythonSpell::Counters)
