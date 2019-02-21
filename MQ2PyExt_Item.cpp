@@ -95,7 +95,7 @@ PythonItem::PythonItem(PCONTENTS item)
 
 	EvolvingCurrentLevel	= item->EvolvingCurrentLevel;
 	EvolvingMaxLevel		= item->EvolvingMaxLevel;
-	EvolvingExpOn			= item->EvolvingExpOn;
+	EvolvingExpOn			= true;
 	EvolvingExpPct			= (float)item->EvolvingExpPct;
 	IsEvolvingItem			= item->IsEvolvingItem;
 
