@@ -36,18 +36,19 @@ CMQPyWnd::CMQPyWnd(CXStr *Template) : CCustomWnd(Template)
 	SavedFontSize_  = 9;
 
 	SetWndNotification(CMQPyWnd);
-	InputBox = (CTextEntryWnd*)GetChildItem("CWChatInput");
-	InputBox->WindowStyle |= 0x800C0;
-	BitOff(WindowStyle, CWS_CLOSE);
+	SetWindowStyle(CWS_CLIENTMOVABLE | CWS_USEMYALPHA | CWS_RESIZEALL | CWS_BORDER | CWS_MINIMIZE | CWS_TITLE);
 
-	InputBox->CRNormal |= 0xFFFFFFFF;
+	InputBox = (CTextEntryWnd*)GetChildItem("CWChatInput");
+	InputBox->AddStyle(CWS_AUTOVSCROLL | CWS_RELATIVERECT | CWS_BORDER); // 0x800C0;
+	InputBox->SetCRNormal(0xFFFFFFFF);
 	InputBox->SetMaxChars(512);
+
 
 	OutputBox = (CStmlWnd*)GetChildItem("CWChatOutput");
 	OutBoxLines = 0;
 	//*(DWORD*)&(((PCHAR)OutputBox)[EQ_CHAT_HISTORY_OFFSET]) = 400;
 
-	OutputBox->Clickable = 1;
+	OutputBox->SetClickable(true);
 
 	this->LoadChatFromINI();
 	this->SaveChatToINI();
@@ -129,7 +130,7 @@ int CMQPyWnd::WndNotification(CXWnd *pWnd, unsigned int Message, void *data)
 	{
 		if (Message == XWM_CLOSE)
 		{
-			dShow = 1;
+			SetVisible(true);
 			return 1;
 		}
 	} 
@@ -191,7 +192,7 @@ void CMQPyWnd::SetChatFont(int size)
 	this->OutputBox->ForceParseNow();
 
 	// scroll to bottom of chat window
-	((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->VScrollMax);
+	((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->GetVScrollMax());
 
 	this->FontSize = size;
 };
@@ -221,14 +222,14 @@ void CMQPyWnd::HandleCommand(const char* szBuffer)
 
 			// Indicate that there is more coming
 			MoreCommands = true;
-			SetCXStr(&this->WindowText, "Python (Continued)");
+			CSetWindowText("Python (Continued)");
 		} else {
 			// The code was executed, clear the array
 			CommandBuffer.clear();
 
 			// remove the "MoreCommands" status indication
 			MoreCommands = false;
-			SetCXStr(&this->WindowText, "Python");
+			CSetWindowText("Python");
 		}
 	}
 	catch (std::exception e) {
@@ -237,7 +238,7 @@ void CMQPyWnd::HandleCommand(const char* szBuffer)
 		MoreCommands = false;
 		CommandBuffer.clear();
 
-		SetCXStr(&this->WindowText, "Python");
+		CSetWindowText("Python");
 		PyErr_Print();
 	}
 }
@@ -284,27 +285,29 @@ void CMQPyWnd::LoadChatFromINI()
 	CHAR Buffer[MAX_STRING] = {0};
 	sprintf_s(szChatINISection, "%s.%s", EQADDR_SERVERNAME, ((PCHARINFO)pCharData)->Name);
 
-	this->Location.top      = GetPrivateProfileInt(szChatINISection, "ChatTop",		ChatTop_, INIFileName);
-	this->Location.bottom   = GetPrivateProfileInt(szChatINISection, "ChatBottom",	ChatBottom_, INIFileName);
-	this->Location.left     = GetPrivateProfileInt(szChatINISection, "ChatLeft",	ChatLeft_, INIFileName);
-	this->Location.right    = GetPrivateProfileInt(szChatINISection, "ChatRight",	ChatRight_, INIFileName);
-	this->Locked            = GetPrivateProfileInt(szChatINISection, "Locked",		Locked_, INIFileName);
-	this->Fades             = GetPrivateProfileInt(szChatINISection, "Fades",		Fades_, INIFileName);
-	this->FadeDelay         = GetPrivateProfileInt(szChatINISection, "Delay",		DelayTime_, INIFileName);
-	this->FadeDuration      = GetPrivateProfileInt(szChatINISection, "Duration",	Duration_, INIFileName);
-	this->Alpha             = GetPrivateProfileInt(szChatINISection, "Alpha",		Alpha_, INIFileName);
-	this->FadeToAlpha       = GetPrivateProfileInt(szChatINISection, "FadeToAlpha",	FadeToAlpha_, INIFileName);
-	this->BGType            = GetPrivateProfileInt(szChatINISection, "BGType",		BGType_, INIFileName);
+	SetLocation({
+		(LONG)GetPrivateProfileInt(szChatINISection, "ChatLeft", ChatLeft_, INIFileName),
+		(LONG)GetPrivateProfileInt(szChatINISection, "ChatTop", ChatTop_, INIFileName),
+		(LONG)GetPrivateProfileInt(szChatINISection, "ChatRight", ChatRight_, INIFileName),
+		(LONG)GetPrivateProfileInt(szChatINISection, "ChatBottom", ChatBottom_, INIFileName) });
+	SetLocked(GetPrivateProfileInt(szChatINISection, "Locked", Locked_, INIFileName));
+	SetFades(GetPrivateProfileInt(szChatINISection, "Fades", Fades_, INIFileName));
+	SetFadeDelay(GetPrivateProfileInt(szChatINISection, "Delay", DelayTime_, INIFileName));
+	SetFadeDuration(GetPrivateProfileInt(szChatINISection, "Duration", Duration_, INIFileName));
+	SetAlpha(GetPrivateProfileInt(szChatINISection, "Alpha", Alpha_, INIFileName));
+	SetFadeToAlpha(GetPrivateProfileInt(szChatINISection, "FadeToAlpha", FadeToAlpha_, INIFileName));
+	SetBGType(GetPrivateProfileInt(szChatINISection, "BGType", BGType_, INIFileName));
+
 	ARGBCOLOR col = { 0 };
-	col.ARGB = this->BGColor;
+	col.ARGB = GetBGColor();
 	col.A = GetPrivateProfileInt(szChatINISection, "BGTint.alpha", BGTint_.A, INIFileName);
 	col.R = GetPrivateProfileInt(szChatINISection, "BGTint.red", BGTint_.R, INIFileName);
 	col.G = GetPrivateProfileInt(szChatINISection, "BGTint.green", BGTint_.G, INIFileName);
 	col.B = GetPrivateProfileInt(szChatINISection, "BGTint.blue",	BGTint_.B, INIFileName);
-	this->BGColor = col.ARGB;
+	SetBGColor(col.ARGB);
 
 	GetPrivateProfileString(szChatINISection, "WindowTitle", "Python", Buffer, MAX_STRING, INIFileName);
-	SetCXStr(&this->WindowText, Buffer);
+	CSetWindowText(Buffer);
 
 	this->SetChatFont(GetPrivateProfileInt(szChatINISection, "FontSize", SavedFontSize_, INIFileName));
 }
@@ -331,31 +334,33 @@ void CMQPyWnd::DoSaveChatToDefault()
 		}
 	}
 
-	if (this->Minimized) {
-		WritePrivateProfileString(szChatINISection, "ChatTop", SafeItoa(this->OldLocation.top, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatBottom", SafeItoa(this->OldLocation.bottom, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatLeft", SafeItoa(this->OldLocation.left, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatRight", SafeItoa(this->OldLocation.right, szTemp, 10), INIFileName);
+	if (IsMinimized()) {
+		RECT oldLocation = GetOldLocation();
+		WritePrivateProfileString(szChatINISection, "ChatTop", SafeItoa(oldLocation.top, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatBottom", SafeItoa(oldLocation.bottom, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatLeft", SafeItoa(oldLocation.left, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatRight", SafeItoa(oldLocation.right, szTemp, 10), INIFileName);
 	} else {
-		WritePrivateProfileString(szChatINISection, "ChatTop", SafeItoa(this->Location.top, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatBottom", SafeItoa(this->Location.bottom, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatLeft", SafeItoa(this->Location.left, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection, "ChatRight", SafeItoa(this->Location.right, szTemp, 10), INIFileName);
+		RECT location = GetLocation();
+		WritePrivateProfileString(szChatINISection, "ChatTop", SafeItoa(location.top, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatBottom", SafeItoa(location.bottom, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatLeft", SafeItoa(location.left, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection, "ChatRight", SafeItoa(location.right, szTemp, 10), INIFileName);
 	}
 
-	GetCXStr(this->WindowText, szTemp);
+	GetCXStr(CGetWindowText(), szTemp, MAX_STRING);
 	WritePrivateProfileString(szChatINISection, "WindowTitle", szTemp, INIFileName);
 
-	WritePrivateProfileString(szChatINISection, "Locked", SafeItoa(this->Locked, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Fades", SafeItoa(this->Fades, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Delay", SafeItoa(this->MouseOver, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Duration",	SafeItoa(this->FadeDuration, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Alpha", SafeItoa(this->Alpha, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "FadeToAlpha", SafeItoa(this->FadeToAlpha, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGType", SafeItoa(this->BGType, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Locked", SafeItoa(IsLocked(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Fades", SafeItoa(GetFades(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Delay", SafeItoa(GetFadeDelay(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Duration",	SafeItoa(GetFadeDuration(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Alpha", SafeItoa(GetAlpha(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "FadeToAlpha", SafeItoa(GetFadeToAlpha(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGType", SafeItoa(GetBGType(), szTemp, 10), INIFileName);
 
 	ARGBCOLOR col = { 0 };
-	col.ARGB = this->BGColor;
+	col.ARGB = GetBGColor();
 	WritePrivateProfileString(szChatINISection, "BGTint.alpha", SafeItoa(col.A, szTemp, 10), INIFileName);
 	WritePrivateProfileString(szChatINISection, "BGTint.red", SafeItoa(col.R, szTemp, 10), INIFileName);
 	WritePrivateProfileString(szChatINISection, "BGTint.green", SafeItoa(col.G, szTemp, 10), INIFileName);
@@ -378,35 +383,37 @@ void CMQPyWnd::SaveChatToINI()
 		}
 	}
 
-	if (this->Minimized)
+	if (this->IsMinimized())
 	{
-		WritePrivateProfileString(szChatINISection,"ChatTop", SafeItoa(this->OldLocation.top, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatBottom", SafeItoa(this->OldLocation.bottom, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatLeft", SafeItoa(this->OldLocation.left, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatRight", SafeItoa(this->OldLocation.right, szTemp, 10), INIFileName);
+		RECT oldLocation = GetOldLocation();
+		WritePrivateProfileString(szChatINISection,"ChatTop", SafeItoa(oldLocation.top, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatBottom", SafeItoa(oldLocation.bottom, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatLeft", SafeItoa(oldLocation.left, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatRight", SafeItoa(oldLocation.right, szTemp, 10), INIFileName);
 	}
 	else
 	{
-		WritePrivateProfileString(szChatINISection,"ChatTop", SafeItoa(this->Location.top, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatBottom", SafeItoa(this->Location.bottom, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatLeft", SafeItoa(this->Location.left, szTemp, 10), INIFileName);
-		WritePrivateProfileString(szChatINISection,"ChatRight", SafeItoa(this->Location.right, szTemp, 10), INIFileName);
+		RECT location = GetLocation();
+		WritePrivateProfileString(szChatINISection,"ChatTop", SafeItoa(location.top, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatBottom", SafeItoa(location.bottom, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatLeft", SafeItoa(location.left, szTemp, 10), INIFileName);
+		WritePrivateProfileString(szChatINISection,"ChatRight", SafeItoa(location.right, szTemp, 10), INIFileName);
 	}
 
-	GetCXStr(this->WindowText, szTemp);
+	
+	GetCXStr(CGetWindowText(), szTemp, MAX_STRING);
 	WritePrivateProfileString(szChatINISection, "WindowTitle", szTemp, INIFileName);
 
-	WritePrivateProfileString(szChatINISection, "Locked", SafeItoa(this->Locked, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Fades", SafeItoa(this->Fades, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Delay", SafeItoa(this->MouseOver, szTemp, 10), INIFileName);
-
-	WritePrivateProfileString(szChatINISection, "Duration", SafeItoa(this->FadeDuration, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "Alpha", SafeItoa(this->Alpha, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "FadeToAlpha", SafeItoa(this->FadeToAlpha, szTemp, 10), INIFileName);
-	WritePrivateProfileString(szChatINISection, "BGType", SafeItoa(this->BGType, szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Locked", SafeItoa(IsLocked(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Fades", SafeItoa(GetFades(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Delay", SafeItoa(GetFadeDelay(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Duration", SafeItoa(GetFadeDuration(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "Alpha", SafeItoa(GetAlpha(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "FadeToAlpha", SafeItoa(GetFadeToAlpha(), szTemp, 10), INIFileName);
+	WritePrivateProfileString(szChatINISection, "BGType", SafeItoa(GetBGType(), szTemp, 10), INIFileName);
 
 	ARGBCOLOR col = { 0 };
-	col.ARGB = this->BGColor;
+	col.ARGB = GetBGColor();
 	WritePrivateProfileString(szChatINISection, "BGTint.alpha", SafeItoa(col.A, szTemp, 10), INIFileName);
 	WritePrivateProfileString(szChatINISection, "BGTint.red", SafeItoa(col.R, szTemp, 10), INIFileName);
 	WritePrivateProfileString(szChatINISection, "BGTint.green", SafeItoa(col.G, szTemp, 10), INIFileName);
@@ -424,7 +431,7 @@ void CMQPyWnd::AppendText(const CXStr& text) {
 		//CXStr empty;
 		//this->OutputBox->SetSTMLText(empty, true, NULL);
 		if (this->OutBoxLines >= MAX_CHAT_SIZE) {
-			DWORD scrollPos = this->OutputBox->VScrollPos;
+			DWORD scrollPos = this->OutputBox->GetVScrollPos();
 			DWORD diff = this->OutBoxLines - CHAT_SIZE_RESET;
 			//WriteChatf("CMQPyWnd::AppendText: %d, %d", this->OutBoxLines, diff);
 			this->OutputBox->StripFirstSTMLLines(diff);
@@ -432,7 +439,7 @@ void CMQPyWnd::AppendText(const CXStr& text) {
 		}
 		this->OutputBox->AppendSTML(text);
 		++this->OutBoxLines;
-		((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->VScrollMax);
+		((CXWnd*)this->OutputBox)->SetVScrollPos(this->OutputBox->GetVScrollMax());
 		//this->OutputBox->ForceParseNow();
 		//WriteChatf("content: --");
 		//CXStr content = this->OutputBox->GetSTMLText();
@@ -456,7 +463,7 @@ void CMQPyWnd::Write(const char* msg, ...)
 	va_start(valist, msg);
 	vsprintf_s(LineBuffer, MAX_STRING * 10, msg, valist);
 
-	this->dShow = 1;
+	this->SetVisible(true);
 	
 	MQToSTML(LineBuffer, ProcessedBuffer, MAX_STRING * 10, 0xffffffff);
 	strcat_s(ProcessedBuffer, MAX_STRING, "<br>");
@@ -473,7 +480,7 @@ void CMQPyWnd::Write_NoBreak(const char* msg, ...)
 	va_start(valist, msg);
 	vsprintf_s(LineBuffer, MAX_STRING * 10, msg, valist);
 
-	this->dShow = 1;
+	this->SetVisible(true);
 	
 	MQToSTML(LineBuffer, ProcessedBuffer, MAX_STRING * 10, 0xffffffff);
 

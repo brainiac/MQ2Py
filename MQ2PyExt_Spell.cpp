@@ -1,7 +1,7 @@
 /* MQ2PyExt_Spell.cpp
  * Copyright (c) 2009 Stephen Raub.
  *
- * Distribution is not allowed without the consent of the author. 
+ * Distribution is not allowed without the consent of the author.
  *
  * This module implements the spell info support
  */
@@ -139,14 +139,16 @@ float PythonSpell::ModifiedCastTime()
 		throw_error_already_set();
 	}
 
-	float mct = (float)(pCharData1->GetAACastingTimeModifier((EQ_Spell*)Spell) 
-		+ pCharData1->GetFocusCastingTimeModifier((EQ_Spell*)Spell, 0, 0)
-		+ Spell->CastTime) / 1000.0f;
+	int64_t myaacastingtime = (int64_t)GetCastingTimeModifier((EQ_Spell*)Spell);
+	VePointer<CONTENTS>pc;
+	int myfocuscastingtime = GetFocusCastingTimeModifier((EQ_Spell*)Spell, pc, false);
+	int64_t mycasttime = (int64_t)Spell->CastTime;
+	int64_t mct = myaacastingtime + myfocuscastingtime + mycasttime;
 
-	if (mct < 0.50f * ((float)Spell->CastTime / 1000.0f))
-		return 0.50f * ((float)Spell->CastTime / 1000.0f);
-	
-	return mct;
+	if (Spell->CastTime > 0 && mct < (Spell->CastTime / 2.f))
+		return (float)Spell->CastTime / 2.f;
+
+	return (float)mct;
 }
 
 float PythonSpell::ModifiedRange()
@@ -159,7 +161,8 @@ float PythonSpell::ModifiedRange()
 		throw_error_already_set();
 	}
 
-	return Spell->Range + (float)pCharData1->GetFocusRangeModifier((EQ_Spell*)Spell, 0);
+	VePointer<CONTENTS> n;
+	return Spell->Range + (float)GetFocusRangeModifier((EQ_Spell*)Spell, n);
 }
 
 python::dict PythonSpell::Level()
@@ -235,7 +238,7 @@ std::string PythonSpell::ResistType()
 		case 1: return "Magic";
 		case 0: return "Unresistable";
 	}
-	
+
 	return "Unknown";
 }
 
@@ -531,5 +534,5 @@ void Init_Module_PyMQ2_Spell()
 		// Utils
 		.def("IsValid", &PythonSpell::IsValid)
 		.def("__repr__", &PythonSpell::__repr__)
-	;		
+	;
 }
