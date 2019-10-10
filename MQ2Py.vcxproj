@@ -72,7 +72,7 @@
     <ProjectReference />
     <ProjectReference />
     <PostBuildEvent>
-      <Command>copy /y $(SolutionDir)packages\python2x86.2.7.13\tools\python27.dll $(OutDir)</Command>
+      <Command>copy /y "$(SolutionDir)packages\python2x86.2.7.13\tools\python27.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
