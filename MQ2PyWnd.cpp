@@ -17,7 +17,7 @@ using namespace boost::python;
 #define CHAT_SIZE_RESET 200
 
 
-CMQPyWnd::CMQPyWnd(CXStr *Template) : CCustomWnd(Template)
+CMQPyWnd::CMQPyWnd(CXStr *Template) : CCustomWnd(*Template)
 {
 	// Python Window Position Defaults
 	ChatTop_        = 10;
