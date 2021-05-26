@@ -1,7 +1,7 @@
 /* MQ2PyExt_Enum.cpp
  * Copyright (c) 2009 Stephen Raub.
  *
- * Distribution is not allowed without the consent of the author. 
+ * Distribution is not allowed without the consent of the author.
  *
  * This module implements the enumerations for use in python
  */
@@ -116,12 +116,12 @@ enum UserColor
 	EchoChat8 = USERCOLOR_ECHO_CHAT_8,
 	EchoChat9 = USERCOLOR_ECHO_CHAT_9,
 	EchoChat10 = USERCOLOR_ECHO_CHAT_10,
-	AvatarCommand = USERCOLOR_AVATAR_COMMAND,
+	AvatarCommand = USERCOLOR_AVATAR_CMD,
 	Link = USERCOLOR_LINK,
 	Raid = USERCOLOR_RAID,
 	Pet = USERCOLOR_PET,
 	DamageShield = USERCOLOR_DAMAGESHIELD,
-	GroupRaidRoleMsg = USERCOLOR_GROUP_RAID_ROLE_MSG,
+	GroupRaidRoleMsg = USERCOLOR_LEADER,
 	PetRampFlurry = USERCOLOR_PETRAMPFLURRY,
 	PetCrits = USERCOLOR_PETCRITS,
 	Focus = USERCOLOR_FOCUS,
