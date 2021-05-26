@@ -1,7 +1,7 @@
 /* MQ2PyExt_Enum.cpp
  * Copyright (c) 2009 Stephen Raub.
  *
- * Distribution is not allowed without the consent of the author. 
+ * Distribution is not allowed without the consent of the author.
  *
  * This module implements the enumerations for use in python
  */
@@ -116,12 +116,12 @@ enum UserColor
 	EchoChat8 = USERCOLOR_ECHO_CHAT_8,
 	EchoChat9 = USERCOLOR_ECHO_CHAT_9,
 	EchoChat10 = USERCOLOR_ECHO_CHAT_10,
-	Reserved = USERCOLOR_RESERVED,
+	AvatarCommand = USERCOLOR_AVATAR_CMD,
 	Link = USERCOLOR_LINK,
 	Raid = USERCOLOR_RAID,
 	Pet = USERCOLOR_PET,
 	DamageShield = USERCOLOR_DAMAGESHIELD,
-	Leader = USERCOLOR_LEADER,
+	GroupRaidRoleMsg = USERCOLOR_LEADER,
 	PetRampFlurry = USERCOLOR_PETRAMPFLURRY,
 	PetCrits = USERCOLOR_PETCRITS,
 	Focus = USERCOLOR_FOCUS,
@@ -132,7 +132,7 @@ enum UserColor
 	ItemSpeech = USERCOLOR_ITEM_SPEECH,
 	StrikeThrough = USERCOLOR_STRIKETHROUGH,
 	Stun = USERCOLOR_STUN,
-	Reserved2 = USERCOLOR_RESERVED2,
+	SwarmPetDeath = USERCOLOR_SWARM_PET_DEATH,
 	Fellowship = USERCOLOR_FELLOWSHIP,
 	NPCSpeech = USERCOLOR_NPC_SPEECH,
 	NPCSpeechToYou = USERCOLOR_NPC_SPEECH_TO_YOU,
@@ -228,12 +228,12 @@ void Initialize_Enumerations()
 		.value("EchoChat8", EchoChat8)
 		.value("EchoChat9", EchoChat9)
 		.value("EchoChat10", EchoChat10)
-		.value("Reserved", Reserved)
+		.value("AvatarCommand", AvatarCommand)
 		.value("Link", Link)
 		.value("Raid", Raid)
 		.value("Pet", Pet)
 		.value("DamageShield", DamageShield)
-		.value("Leader", Leader)
+		.value("GroupRaidRoleMsg", GroupRaidRoleMsg)
 		.value("PetRampFlurry", PetRampFlurry)
 		.value("PetCrits", PetCrits)
 		.value("Focus", Focus)
@@ -244,7 +244,7 @@ void Initialize_Enumerations()
 		.value("ItemSpeech", ItemSpeech)
 		.value("StrikeThrough", StrikeThrough)
 		.value("Stun", Stun)
-		.value("Reserved2", Reserved2)
+		.value("SwarmPetDeath", SwarmPetDeath)
 		.value("Fellowship", Fellowship)
 		.value("NPCSpeech", NPCSpeech)
 		.value("NPCSpeechToYou", NPCSpeechToYou)
